@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: estimate-backend
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn estimate_backend.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://estimatePro_db_owner:npg_b9CRzVsJ4Qal@ep-soft-tooth-a535w52o-pooler.us-east-2.aws.neon.tech/estimatePro_db?sslmode=require
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        value: django-insecure-!gn63l3*!px0r6nax@va!i2l6a!3q-3#n9#ida+h5)p1k58_q!
