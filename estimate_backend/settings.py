@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!gn63l3*!px0r6nax@va!i2l6a!3q-3#n9#ida+h5)p1k58_q!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.56.64','127.0.0.1']
+ALLOWED_HOSTS = ['192.168.171.64','127.0.0.1','estimatePro.pythonanywhere.com']
 
 
 # Application definition
@@ -38,18 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    # 'cloudinary',
-    # 'cloudinary_storage',
+    
     'estimateApp'
 ]
 
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': 'dr5aztk79',
-#     'API_KEY': '597761295553636',
-#     'API_SECRET': 'MFKu-eDPEGHZ9ZzWxqlPxCFt4dU'
-# }
 
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
