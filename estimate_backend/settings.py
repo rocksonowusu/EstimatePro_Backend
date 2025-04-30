@@ -24,13 +24,14 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-key')
+SECRET_KEY = 'django-insecure-!gn63l3*!px0r6nax@va!i2l6a!3q-3#n9#ida+h5)p1k58_q!'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', 'estimate.pythonanywhere.com']
 
 # Application definition
 
