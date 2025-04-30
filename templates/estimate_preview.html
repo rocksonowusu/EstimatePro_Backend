@@ -105,6 +105,7 @@
     <h1>{{ estimate.estimate_title }}</h1>
     <p><strong>Client:</strong> {{ estimate.client_name }}</p>
     <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
+    <p><strong>Letterhead URL:</strong> {{ letterhead_url }}</p>
     
     <div class="table-container">
       <table>
