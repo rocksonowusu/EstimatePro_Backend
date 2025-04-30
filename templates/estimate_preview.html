@@ -203,7 +203,6 @@
         <div class="section-title">Estimate Details</div>
         <p><strong>Estimate #:</strong> {{ estimate.estimate_number|default:"EST-" }}{{ estimate.id }}</p>
         <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
-        <p><strong>Valid Until:</strong> {{ estimate.valid_until|date:"F j, Y"|default:"30 days from issue" }}</p>
       </div>
     </div>
     
