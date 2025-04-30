@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-!gn63l3*!px0r6nax@va!i2l6a!3q-3#n9#ida+h5)p1k58_q!
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', 'estimatepro.pythonanywhere.com']
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', 'estimatepro.pythonanywhere.com','127.0.0.1']
 
 # Application definition
 
@@ -135,7 +135,9 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
