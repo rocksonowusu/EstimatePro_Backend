@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-!gn63l3*!px0r6nax@va!i2l6a!3q-3#n9#ida+h5)p1k58_q!
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', 'estimate.pythonanywhere.com']
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', 'estimatepro.pythonanywhere.com']
 
 # Application definition
 
