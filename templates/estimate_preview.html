@@ -229,8 +229,8 @@
               {% endif %}
             </td>
             <td>{{ item.quantity }}</td>
-            <td>${{ item.unit_price|floatformat:2 }}</td>
-            <td class="amount-column">${{ item.amount|floatformat:2 }}</td>
+            <td>GH₡{{ item.unit_price|floatformat:2 }}</td>
+            <td class="amount-column">GH₡{{ item.amount|floatformat:2 }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -241,15 +241,15 @@
       <div class="total-table">
         <div class="total-row">
           <div>Total Materials:</div>
-          <div>${{ estimate.total_materials|floatformat:2 }}</div>
+          <div>GH₡{{ estimate.total_materials|floatformat:2 }}</div>
         </div>
         <div class="total-row">
           <div>Workmanship:</div>
-          <div>${{ estimate.workmanship|floatformat:2 }}</div>
+          <div>GH₡{{ estimate.workmanship|floatformat:2 }}</div>
         </div>
         <div class="total-row grand">
           <div>GRAND TOTAL:</div>
-          <div>${{ estimate.grand_total|floatformat:2 }}</div>
+          <div>GH₡{{ estimate.grand_total|floatformat:2 }}</div>
         </div>
       </div>
     </div>
