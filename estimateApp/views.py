@@ -75,7 +75,8 @@ class EstimatePreview(APIView):
             return Response({'error': 'Estimate not found'}, status=status.HTTP_404_NOT_FOUND)
         
         business_profile = getattr(estimate.created_by, 'business_profile', None)
-        letterhead_url = business_profile.background_image.url if business_profile and business_profile.background_image else None
+        letterhead_url = request.build_absolute_uri(business_profile.background_image.url) if business_profile and business_profile.background_image else None
+
 
         context = {
             'estimate': estimate,
