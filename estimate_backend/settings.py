@@ -84,11 +84,18 @@ WSGI_APPLICATION = 'estimate_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': dj_database_url.parse(
+#         'postgresql://estimatePro_db_owner:npg_b9CRzVsJ4Qal@ep-soft-tooth-a535w52o-pooler.us-east-2.aws.neon.tech/estimatePro_db?sslmode=require'
+#     )
+#     }
+
 DATABASES = {
-    'default': dj_database_url.parse(
-        'postgresql://estimatePro_db_owner:npg_b9CRzVsJ4Qal@ep-soft-tooth-a535w52o-pooler.us-east-2.aws.neon.tech/estimatePro_db?sslmode=require'
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
 
 
 # Password validation
