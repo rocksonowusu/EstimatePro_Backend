@@ -49,7 +49,7 @@ class OnboardingSerializers(serializers.Serializer):
 class MaterialDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaterialDescription
-        fields = ['id', 'name', 'unit']
+        fields = ['id', 'name']
 
 class EstimateItemSerializer(serializers.ModelSerializer):
     chosen_material = MaterialDescriptionSerializer(read_only=True)
@@ -62,7 +62,7 @@ class EstimateItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EstimateItem
-        fields = ['id', 'chosen_material', 'chosen_material_id', 'description', 'quantity', 'unit_price', 'amount']
+        fields = ['id', 'chosen_material', 'chosen_material_id', 'description', 'quantity','unit', 'unit_price', 'amount']
 
 class EstimateSerializer(serializers.ModelSerializer):
     items = EstimateItemSerializer(many=True)

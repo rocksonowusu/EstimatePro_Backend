@@ -227,7 +227,9 @@
                 {{ item.description }}
               {% endif %}
             </td>
-            <td>{{ item.quantity }}</td>
+            <td>
+              {{ item.quantity }} {{ item.get_unit_display }}
+            </td>
             <td>GH₡{{ item.unit_price|floatformat:2 }}</td>
             <td class="amount-column">GH₡{{ item.amount|floatformat:2 }}</td>
           </tr>

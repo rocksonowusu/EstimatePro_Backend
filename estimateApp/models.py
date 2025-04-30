@@ -46,16 +46,26 @@ class Estimate(models.Model):
     
 class MaterialDescription(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    unit = models.CharField(max_length=100,blank=True)
+   
 
     def __str__(self):
         return self.name
 
 class EstimateItem(models.Model):
+    UNIT_CHOICES = [
+        ('pieces', 'Pieces'),
+        ('meters', 'Meters'),
+        ('yards', 'Yards'),
+        ('feet', 'Feet'),
+        ('coils', 'Coils'),
+        ('kg', 'Kilograms'),
+        ('units', 'Units'),
+    ]
     estimate = models.ForeignKey(Estimate,related_name="items",on_delete=models.CASCADE)
     chosen_material = models.ForeignKey(MaterialDescription, null=True,on_delete=models.SET_NULL)
     description = models.CharField(max_length=255, blank=True)
     quantity = models.DecimalField(max_digits=10, decimal_places=2,default=2)
+    unit = models.CharField(max_length=20, choices=UNIT_CHOICES, default='pieces')
     unit_price = models.DecimalField(max_digits=10, decimal_places=2,default=2)
     amount = models.DecimalField(max_digits=10, decimal_places=2,default=2)
 
