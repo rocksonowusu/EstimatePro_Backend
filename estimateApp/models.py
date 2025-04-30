@@ -59,6 +59,7 @@ class EstimateItem(models.Model):
         ('feet', 'Feet'),
         ('coils', 'Coils'),
         ('kg', 'Kilograms'),
+        ('boxes', 'Boxes'),
         ('units', 'Units'),
     ]
     estimate = models.ForeignKey(Estimate,related_name="items",on_delete=models.CASCADE)
