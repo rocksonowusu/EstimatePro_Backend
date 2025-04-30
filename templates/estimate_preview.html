@@ -3,118 +3,222 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Estimate Preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big Tony Enterprise - Estimate</title>
   <style>
     @page {
-        size: A4;
-        margin: 0;
+      size: A4;
+      margin: 0;
     }
-
+    
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+    
     body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        {% if letterhead_path %}
-          background: url("file://{{ letterhead_path }}") no-repeat center center;
-          background-size: 100% 100%; /* Forces the image to exactly fill the page */
-        {% else %}
-          background: #f8f8f8; /* Light gray background as fallback */
-        {% endif %}
-        color: #333;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      {% if letterhead_path %}
+        background: url("file://{{ letterhead_path }}") no-repeat top center;
+        background-size: 100% auto;
+      {% else %}
+        background: #f8f8f8;
+      {% endif %}
+      color: #333;
+      position: relative;
     }
-
+    
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.06;
+      z-index: -1;
+      width: 70%;
+    }
+    
     .content {
-        margin: 250px 50px 50px 50px;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.85); /* Light overlay for readability */
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Add subtle shadow for 3D effect */
+      margin: 200px 40px 50px 40px;
+      padding: 0;
+      position: relative;
+      z-index: 1;
     }
-
+    
+    .estimate-header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #3038A0;
+      margin-bottom: 25px;
+    }
+    
     h1 {
-        font-size: 28px;
-        margin-bottom: 20px;
-        color: #2e6e9e;
-        text-align: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #3038A0;
+      font-weight: 700;
     }
-
-    h2, h3 {
-        color: #333;
-        font-size: 20px;
-        margin-bottom: 10px;
+    
+    .client-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
     }
-
+    
+    .client-details, .estimate-details {
+      width: 48%;
+    }
+    
+    .section-title {
+      font-size: 16px;
+      text-transform: uppercase;
+      color: #3038A0;
+      font-weight: 500;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    
     p {
-        margin: 5px 0;
-        font-size: 16px;
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.5;
     }
-
+    
     .table-container {
-        margin-top: 20px;
-        width: 100%;
-        overflow-x: auto;
+      margin-top: 20px;
+      width: 100%;
     }
-
+    
     table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid #333;
+      width: 100%;
+      border-collapse: collapse;
     }
-
+    
     th, td {
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #ddd;
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
     }
-
+    
     th {
-        background-color: #f4f4f4;
-        font-weight: bold;
-        color: #333;
+      background-color: #f9f9f9;
+      font-weight: 500;
+      color: #3038A0;
+      text-transform: uppercase;
+      font-size: 13px;
     }
-
-    td {
-        background-color: #fff;
+    
+    tr:nth-child(even) td {
+      background-color: rgba(248, 249, 252, 0.7);
     }
-
-    .total {
-        font-weight: bold;
-        font-size: 18px;
-        margin-top: 10px;
+    
+    .amount-column {
+      text-align: right;
     }
-
+    
+    .total-section {
+      margin-top: 30px;
+      width: 100%;
+    }
+    
+    .total-table {
+      width: 350px;
+      margin-left: auto;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .total-row.grand {
+      border-top: 2px solid #3038A0;
+      border-bottom: 2px solid #3038A0;
+      font-weight: 700;
+      font-size: 16px;
+      color: #3038A0;
+      margin-top: 10px;
+      padding: 12px 0;
+    }
+    
+    .notes-section {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: rgba(248, 249, 252, 0.8);
+      border-left: 4px solid #3038A0;
+    }
+    
     .footer {
-        margin-top: 30px;
-        font-size: 14px;
-        color: #666;
-        text-align: center;
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
     }
-
-    .footer p {
-        margin: 5px 0;
+    
+    .ref-section {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0 30px 0;
+      font-size: 13px;
     }
-
-    .footer a {
-        color: #2e6e9e;
-        text-decoration: none;
+    
+    .thank-you {
+      text-align: center;
+      margin-top: 30px;
+      font-weight: 500;
+      color: #3038A0;
     }
   </style>
 </head>
 <body>
+  <!-- Optional watermark using the star logo -->
+  <div class="watermark">
+    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <path d="M150,20 L172,90 L245,90 L186,135 L208,205 L150,160 L92,205 L114,135 L55,90 L128,90 Z" fill="#3038A0"/>
+      <circle cx="150" cy="150" r="40" fill="white"/>
+      <text x="150" y="170" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="#3038A0">T</text>
+    </svg>
+  </div>
+
   <div class="content">
-    <h1>{{ estimate.estimate_title }}</h1>
-    <p><strong>Client:</strong> {{ estimate.client_name }}</p>
-    <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
-    <p><strong>Letterhead URL:</strong> {{ letterhead_url }}</p>
+    <div class="estimate-header">
+      <h1>{{ estimate.estimate_title }}</h1>
+    </div>
+    
+    <div class="client-info">
+      <div class="client-details">
+        <div class="section-title">Client Information</div>
+        <p><strong>Name:</strong> {{ estimate.client_name }}</p>
+        <p><strong>Address:</strong> {{ estimate.client_address|default:"" }}</p>
+        <p><strong>Contact:</strong> {{ estimate.client_contact|default:"" }}</p>
+      </div>
+      
+      <div class="estimate-details">
+        <div class="section-title">Estimate Details</div>
+        <p><strong>Estimate #:</strong> {{ estimate.estimate_number|default:"EST-" }}{{ estimate.id }}</p>
+        <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
+        <p><strong>Valid Until:</strong> {{ estimate.valid_until|date:"F j, Y"|default:"30 days from issue" }}</p>
+      </div>
+    </div>
+    
+    <div class="ref-section">
+      <div>Your Ref: ______________________</div>
+      <div>Our Ref: ______________________</div>
+    </div>
     
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Description</th>
+            <th width="50%">Description</th>
             <th>Quantity</th>
             <th>Unit Price</th>
-            <th>Amount</th>
+            <th class="amount-column">Amount</th>
           </tr>
         </thead>
         <tbody>
@@ -128,25 +232,48 @@
               {% endif %}
             </td>
             <td>{{ item.quantity }}</td>
-            <td>${{ item.unit_price }}</td>
-            <td>${{ item.amount }}</td>
+            <td>${{ item.unit_price|floatformat:2 }}</td>
+            <td class="amount-column">${{ item.amount|floatformat:2 }}</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
     
-    <div class="total">
-      <p><strong>Total Materials:</strong> ${{ estimate.total_materials }}</p>
-      <p><strong>Workmanship:</strong> ${{ estimate.workmanship }}</p>
-      <h3>Grand Total: ${{ estimate.grand_total }}</h3>
-    </div>
-
-    {% if estimate.notes %}
-      <div class="footer">
-        <p><strong>Notes:</strong> {{ estimate.notes }}</p>
+    <div class="total-section">
+      <div class="total-table">
+        <div class="total-row">
+          <div>Total Materials:</div>
+          <div>${{ estimate.total_materials|floatformat:2 }}</div>
+        </div>
+        <div class="total-row">
+          <div>Workmanship:</div>
+          <div>${{ estimate.workmanship|floatformat:2 }}</div>
+        </div>
+        <div class="total-row grand">
+          <div>GRAND TOTAL:</div>
+          <div>${{ estimate.grand_total|floatformat:2 }}</div>
+        </div>
       </div>
+    </div>
+    
+    {% if estimate.notes %}
+    <div class="notes-section">
+      <div class="section-title">Notes</div>
+      <p>{{ estimate.notes }}</p>
+    </div>
     {% endif %}
+    
+    <div class="thank-you">
+      <p>Thank you for your business!</p>
+    </div>
+    
+    <div class="footer">
+      <p>Big Tony Enterprise - General Electrical Installation</p>
+      <p>P.O. Box 293, Ho-Hliha Opp. Stanbic Bank | Tel: (233) 362 000107 / (233) 244 169120 / (233) 208 432259</p>
+      <p>Email: tonyowusuy@gmail.com</p>
+      <p><strong>The Name You Can Trust In ELECTRICALS</strong></p>
+    </div>
   </div>
 </body>
 </html>
