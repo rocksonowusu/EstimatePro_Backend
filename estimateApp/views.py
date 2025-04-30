@@ -75,17 +75,17 @@ class EstimatePreview(APIView):
             return Response({'error': 'Estimate not found'}, status=status.HTTP_404_NOT_FOUND)
         
         business_profile = getattr(estimate.created_by, 'business_profile', None)
-        letterhead_url = request.build_absolute_uri(business_profile.background_image.url) if business_profile and business_profile.background_image else None
-
+        letterhead_path = business_profile.background_image.path if business_profile and business_profile.background_image else None  # Use .path instead of .url
 
         context = {
             'estimate': estimate,
-            'letterhead_url': letterhead_url
+            'letterhead_path': letterhead_path
         }
         html_string = render_to_string('estimate_preview.html', context)
         
         # Generate the PDF file.
         pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+
         
         response = HttpResponse(pdf_file, content_type='application/pdf')
         

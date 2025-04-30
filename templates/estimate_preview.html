@@ -14,8 +14,8 @@
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
-        {% if letterhead_url %}
-          background: url("{{ letterhead_url }}") no-repeat center center;
+        {% if letterhead_path %}
+          background: url("file://{{ letterhead_path }}") no-repeat center center;
           background-size: 100% 100%; /* Forces the image to exactly fill the page */
         {% else %}
           background: #f8f8f8; /* Light gray background as fallback */
