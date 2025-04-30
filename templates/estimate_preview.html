@@ -8,8 +8,9 @@
     @page {
         size: A4;
         margin: 0;
-      }
-      body {
+    }
+
+    body {
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
@@ -17,29 +18,85 @@
           background: url("{{ letterhead_url }}") no-repeat center center;
           background-size: 100% 100%; /* Forces the image to exactly fill the page */
         {% else %}
-          background: #fff;
+          background: #f8f8f8; /* Light gray background as fallback */
         {% endif %}
-      }
-      .content {
-        /* Increase the top margin to drop the content lower (adjust value as needed) */
+        color: #333;
+    }
+
+    .content {
         margin: 250px 50px 50px 50px;
         padding: 20px;
-        background: rgba(255, 255, 255, 0.85); /* Optional overlay for readability */
-      }
-    h1, h2, h3, p {
-      margin: 0 0 10px;
+        background: rgba(255, 255, 255, 0.85); /* Light overlay for readability */
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Add subtle shadow for 3D effect */
     }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #2e6e9e;
+        text-align: center;
+    }
+
+    h2, h3 {
+        color: #333;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin: 5px 0;
+        font-size: 16px;
+    }
+
+    .table-container {
+        margin-top: 20px;
+        width: 100%;
+        overflow-x: auto;
+    }
+
     table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #333;
     }
-    table, th, td {
-      border: 1px solid #333;
-    }
+
     th, td {
-      padding: 8px;
-      text-align: center;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+        color: #333;
+    }
+
+    td {
+        background-color: #fff;
+    }
+
+    .total {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+
+    .footer {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+    }
+
+    .footer p {
+        margin: 5px 0;
+    }
+
+    .footer a {
+        color: #2e6e9e;
+        text-decoration: none;
     }
   </style>
 </head>
@@ -49,37 +106,46 @@
     <p><strong>Client:</strong> {{ estimate.client_name }}</p>
     <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
     
-    <table>
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th>Quantity</th>
-          <th>Unit Price</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in estimate.items.all %}
-        <tr>
-          <td>
-            {% if item.chosen_material %}
-              {{ item.chosen_material.name }}
-            {% else %}
-              {{ item.description }}
-            {% endif %}
-          </td>
-          <td>{{ item.quantity }}</td>
-          <td>${{ item.unit_price }}</td>
-          <td>${{ item.amount }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in estimate.items.all %}
+          <tr>
+            <td>
+              {% if item.chosen_material %}
+                {{ item.chosen_material.name }}
+              {% else %}
+                {{ item.description }}
+              {% endif %}
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.unit_price }}</td>
+            <td>${{ item.amount }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
     
-    <p><strong>Total Materials:</strong> ${{ estimate.total_materials }}</p>
-    <p><strong>Workmanship:</strong> ${{ estimate.workmanship }}</p>
-    <h3>Grand Total: ${{ estimate.grand_total }}</h3>
-    <p>{{ estimate.notes }}</p>
+    <div class="total">
+      <p><strong>Total Materials:</strong> ${{ estimate.total_materials }}</p>
+      <p><strong>Workmanship:</strong> ${{ estimate.workmanship }}</p>
+      <h3>Grand Total: ${{ estimate.grand_total }}</h3>
+    </div>
+
+    {% if estimate.notes %}
+      <div class="footer">
+        <p><strong>Notes:</strong> {{ estimate.notes }}</p>
+      </div>
+    {% endif %}
   </div>
 </body>
 </html>
