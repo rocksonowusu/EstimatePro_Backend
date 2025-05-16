@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import UserProfile, Estimate,MaterialDescription, BusinessProfile
-from .serializers import OnboardingSerializers, EstimateSerializer,MaterialDescriptionSerializer, BusinessProfileSerializer,UserProfileSerializer
+from .models import UserProfile, Estimate,MaterialDescription, BusinessProfile,EstimateItem
+from .serializers import OnboardingSerializers, EstimateSerializer,MaterialDescriptionSerializer, BusinessProfileSerializer,UserProfileSerializer,EstimateItemSerializer
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
@@ -214,3 +214,70 @@ class DeleteAccountView(APIView):
                 {'error': 'User not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+class EditEstimateView(APIView):
+    def put(self, request, pk, format=None):
+        """
+        Edit an exixting estimate by id
+        """
+        #Make a copy od data
+        data = request.data.copy()
+
+        if 'user_email' in data:
+            data.pop('user_email')
+        #Get Estimate by id
+        try:
+            estimate = Estimate.objects.get(pk=pk)
+        except Estimate.DoesNotExist:
+            return Response(
+                {'error':"Estimate not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = EstimateSerializer(estimate, data = request.data, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+
+            if 'items' in request.data:
+                items_data = request.data['items']
+                self.update_estimate_items(estimate, items_data)
+
+            # Return the updated estimate
+            updated_estimate = Estimate.objects.get(pk=pk)
+            return Response(
+                EstimateSerializer(updated_estimate).data,
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update_estimate_items(self, estimate, items_data):
+        """
+        Helper function to update estimate items
+        """
+        # Get the existing items
+        existing_items = estimate.items.all()
+        print(existing_items)
+        existing_item_ids = set(item.id for item in existing_items)
+
+        # Process items from request
+        updated_item_ids = set()
+
+        for item_data in items_data:
+            item_id = item_data.get('id', None)
+            
+            if item_id and item_id in existing_item_ids:
+                # Update existing items
+                item = existing_item_ids.get(id = item_id)
+                serializer = EstimateItemSerializer(item, data=item_data, partial = True)
+                if serializer.is_valid():
+                    serializer.save()
+                updated_item_ids.add(item_id)
+            else:
+                #Create a new item
+                if 'chosen_material_item_id' in item_data:
+                    item_data['chosen_material'] =item_data.pop('chosen_material_id')
+                EstimateItem.objects.create(estimate = estimate, **item_data)
+
+        # Delete items thats not included in the update
+        items_to_delete = existing_item_ids - updated_item_ids
+        if items_to_delete:
+            estimate.items.filter(id__in=items_to_delete).delete()

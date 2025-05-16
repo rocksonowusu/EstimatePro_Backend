@@ -10,6 +10,9 @@
       size: A4;
       margin: 0;
     }
+    @bottom-center {
+    content: element(footer);
+      }
     
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
     
@@ -88,11 +91,26 @@
       margin-top: 20px;
       width: 100%;
     }
+    table, tr, td, th {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    }
+
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
     
     table {
+      page-break-after: auto;
       width: 100%;
       border-collapse: collapse;
       border: 2px solid #ddd; /* Added thicker border */
+    }
+    .table-container {
+      page-break-inside: auto;
+      break-inside: auto;
+      overflow: visible;
     }
     
     th, td {
@@ -168,7 +186,7 @@
       font-size: 13px;
     }
     
-    .thank-you {
+    .footer {
       text-align: center;
       margin-top: 30px;
       font-weight: 500;
@@ -262,7 +280,7 @@
     </div>
     {% endif %}
     
-    <div class="thank-you">
+    <div class="footer" style="position: running(footer);">
       <p>Thank you for your business!</p>
     </div>
     

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import DeleteAccountView,UserProfileView,BusinessProfileView,OnboardingView, CreateEstimateView, EstimatePreview,MaterialDescriptionListView,GetAllEstimates
+from .views import DeleteAccountView,UserProfileView,BusinessProfileView,OnboardingView, CreateEstimateView, EstimatePreview,MaterialDescriptionListView,GetAllEstimates,EditEstimateView
 
 urlpatterns = [
     path('onboarding/', OnboardingView.as_view(), name='onboarding'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('user-profile/', UserProfileView.as_view(), name='user-profile'),
     path('business-profile/', BusinessProfileView.as_view(), name='business-profile'),
     path('delete-account/', DeleteAccountView.as_view(), name='delete-account'),
+    path('estimates/<int:pk>/edit/', EditEstimateView.as_view(), name='edit-estimate'),
 ]
