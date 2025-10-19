@@ -8,26 +8,30 @@
   <style>
     @page {
       size: A4;
-      margin: 0;
+      margin: 20mm 15mm 20mm 15mm;
     }
-    @bottom-center {
-    content: element(footer);
-      }
     
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
     
-    body {
+    * {
+      box-sizing: border-box;
+    }
+    
+    html, body {
       margin: 0;
       padding: 0;
       font-family: 'Roboto', Arial, sans-serif;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    body {
       {% if letterhead_path %}
         background: url("file://{{ letterhead_path }}") no-repeat top center;
         background-size: 100% auto;
       {% else %}
         background: #f8f8f8;
       {% endif %}
-      color: #333;
-      position: relative;
     }
     
     .watermark {
@@ -38,11 +42,38 @@
       opacity: 0.06;
       z-index: -1;
       width: 70%;
+      pointer-events: none;
+    }
+    
+    .page-header {
+      position: running(header);
+      text-align: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #3038A0;
+      margin-bottom: 15px;
+    }
+    
+    .page-footer {
+      position: running(footer);
+      text-align: center;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    @page {
+      @top-center {
+        content: element(header);
+      }
+      @bottom-center {
+        content: element(footer);
+      }
     }
     
     .content {
-      margin: 200px 40px 50px 40px;
-      padding: 0;
+      margin-top: 180px;
+      padding: 0 20px;
       position: relative;
       z-index: 1;
     }
@@ -52,12 +83,13 @@
       padding-bottom: 20px;
       border-bottom: 2px solid #3038A0;
       margin-bottom: 25px;
+      page-break-after: avoid;
     }
     
     h1 {
       font-size: 28px;
-      margin-bottom: 10px;
-      color: #000000; /* Changed from #3038A0 to black */
+      margin: 0 0 10px 0;
+      color: #000000;
       font-weight: 700;
     }
     
@@ -65,6 +97,8 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 30px;
+      page-break-after: avoid;
+      page-break-inside: avoid;
     }
     
     .client-details, .estimate-details {
@@ -90,27 +124,38 @@
     .table-container {
       margin-top: 20px;
       width: 100%;
-    }
-    table, tr, td, th {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    }
-
-    tr {
-      page-break-inside: avoid;
-      break-inside: avoid;
+      page-break-inside: auto;
     }
     
     table {
-      page-break-after: auto;
       width: 100%;
       border-collapse: collapse;
-      border: 2px solid #ddd; /* Added thicker border */
-    }
-    .table-container {
+      border: 2px solid #ddd;
       page-break-inside: auto;
-      break-inside: auto;
-      overflow: visible;
+    }
+    
+    thead {
+      display: table-header-group;
+      page-break-inside: avoid;
+      page-break-after: avoid;
+    }
+    
+    tbody {
+      display: table-row-group;
+    }
+    
+    tfoot {
+      display: table-footer-group;
+      page-break-inside: avoid;
+    }
+    
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    
+    thead tr {
+      page-break-after: avoid;
     }
     
     th, td {
@@ -118,6 +163,7 @@
       text-align: left;
       border-bottom: 1px solid #ddd;
       font-size: 14px;
+      page-break-inside: avoid;
     }
     
     th {
@@ -136,9 +182,16 @@
       text-align: right;
     }
     
+    /* Prevent orphaned rows */
+    tbody tr {
+      orphans: 3;
+      widows: 3;
+    }
+    
     .total-section {
       margin-top: 30px;
       width: 100%;
+      page-break-inside: avoid;
     }
     
     .total-table {
@@ -168,22 +221,7 @@
       padding: 20px;
       background-color: rgba(248, 249, 252, 0.8);
       border-left: 4px solid #3038A0;
-    }
-    
-    .footer {
-      text-align: center;
-      margin-top: 50px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
-      font-size: 12px;
-      color: #666;
-    }
-    
-    .ref-section {
-      display: flex;
-      justify-content: space-between;
-      margin: 15px 0 30px 0;
-      font-size: 13px;
+      page-break-inside: avoid;
     }
     
     .footer {
@@ -191,11 +229,22 @@
       margin-top: 30px;
       font-weight: 500;
       color: #3038A0;
+      page-break-inside: avoid;
+    }
+    
+    /* Force page break before total section if near bottom */
+    .force-new-page {
+      page-break-before: always;
+    }
+    
+    /* Ensure totals stay together */
+    .keep-together {
+      page-break-inside: avoid;
     }
   </style>
 </head>
 <body>
-  <!-- Optional watermark using the star logo -->
+  <!-- Watermark -->
   <div class="watermark">
     <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <path d="M150,20 L172,90 L245,90 L186,135 L208,205 L150,160 L92,205 L114,135 L55,90 L128,90 Z" fill="#3038A0"/>
@@ -205,34 +254,36 @@
   </div>
 
   <div class="content">
+    <!-- Estimate Header -->
     <div class="estimate-header">
       <h1>{{ estimate.estimate_title }}</h1>
     </div>
     
+    <!-- Client Info -->
     <div class="client-info">
       <div class="client-details">
         <div class="section-title">Client Information</div>
         <p><strong>Name:</strong> {{ estimate.client_name }}</p>
-        <p><strong>Address:</strong> {{ estimate.client_address|default:"" }}</p>
-        <p><strong>Contact:</strong> {{ estimate.client_contact|default:"" }}</p>
+        <p><strong>Address:</strong> {{ estimate.client_address|default:"N/A" }}</p>
+        <p><strong>Contact:</strong> {{ estimate.client_contact|default:"N/A" }}</p>
       </div>
       
       <div class="estimate-details">
         <div class="section-title">Estimate Details</div>
-        <p><strong>Estimate #:</strong> {{ estimate.estimate_number|default:"EST-" }}{{ estimate.id }}</p>
+        <p><strong>Estimate #:</strong> EST-{{ estimate.id }}</p>
         <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
       </div>
     </div>
     
-    
+    <!-- Items Table -->
     <div class="table-container">
       <table>
         <thead>
           <tr>
             <th width="50%">Description</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th class="amount-column">Amount</th>
+            <th width="15%">Quantity</th>
+            <th width="17%">Unit Price</th>
+            <th width="18%" class="amount-column">Amount</th>
           </tr>
         </thead>
         <tbody>
@@ -246,7 +297,7 @@
               {% endif %}
             </td>
             <td>
-              {{ item.quantity }} {{ item.get_unit_display }}
+              {{ item.quantity }} {{ item.unit|default:"pcs" }}
             </td>
             <td>GH₡{{ item.unit_price|floatformat:2 }}</td>
             <td class="amount-column">GH₡{{ item.amount|floatformat:2 }}</td>
@@ -256,7 +307,8 @@
       </table>
     </div>
     
-    <div class="total-section">
+    <!-- Total Section -->
+    <div class="total-section keep-together">
       <div class="total-table">
         <div class="total-row">
           <div>Total Materials:</div>
@@ -273,6 +325,7 @@
       </div>
     </div>
     
+    <!-- Notes Section -->
     {% if estimate.notes %}
     <div class="notes-section">
       <div class="section-title">Notes</div>
@@ -280,11 +333,10 @@
     </div>
     {% endif %}
     
-    <div class="footer" style="position: running(footer);">
+    <!-- Footer -->
+    <div class="footer">
       <p>Thank you for your business!</p>
     </div>
-    
- 
   </div>
 </body>
 </html>

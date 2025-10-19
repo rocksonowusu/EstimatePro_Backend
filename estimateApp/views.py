@@ -212,8 +212,7 @@ class DeleteAccountView(APIView):
         except UserProfile.DoesNotExist:
             return Response(
                 {'error': 'User not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+                status=status.HTTP_404_NOT_FOUND)
 
 class EditEstimateView(APIView):
     def put(self, request, pk, format=None):
@@ -255,8 +254,9 @@ class EditEstimateView(APIView):
         """
         # Get the existing items
         existing_items = estimate.items.all()
+        existing_items_dict = {item.id: item for item in estimate.items.all()}
         print(existing_items)
-        existing_item_ids = set(item.id for item in existing_items)
+        existing_item_ids = set(item.id for item in existing_items_dict.keys())
 
         # Process items from request
         updated_item_ids = set()
@@ -266,17 +266,40 @@ class EditEstimateView(APIView):
             
             if item_id and item_id in existing_item_ids:
                 # Update existing items
-                item = existing_item_ids.get(id = item_id)
-                serializer = EstimateItemSerializer(item, data=item_data, partial = True)
-                if serializer.is_valid():
-                    serializer.save()
+                item = existing_items_dict[item_id]
+            
+                # Handle chosen_material_id if present
+                if 'chosen_material_id' in item_data:
+                    material_id = item_data.pop('chosen_material_id')
+                    if material_id:
+                        try:
+                            material = MaterialDescription.objects.get(id=material_id)
+                            item.chosen_material = material
+                        except MaterialDescription.DoesNotExist:
+                            pass
+                
+                for field, value in item_data.items():
+                    if field != 'id':
+                        setattr(item, field, value)
+                item.save()
                 updated_item_ids.add(item_id)
             else:
-                #Create a new item
-                if 'chosen_material_item_id' in item_data:
-                    item_data['chosen_material'] =item_data.pop('chosen_material_id')
-                EstimateItem.objects.create(estimate = estimate, **item_data)
+                # Create a new item
+                #handle chosen_material_id
+                if 'chosen_material_id' in item_data:
+                    material_id = item_data.pop('chosen_material_id')
+                    if material_id:
+                        try:
+                            material = MaterialDescription.objects.get(id=material_id)
+                            item_data['chosen_material'] = material
+                        except MaterialDescription.DoesNotExist:
+                            pass
 
+                # Remove 'id' if it exists but is None or 0
+                if 'id' in item_data and not item_data['id']:
+                    item_data.pop('id')
+
+                EstimateItem.objects.create(estimate=estimate, **item_data)
         # Delete items thats not included in the update
         items_to_delete = existing_item_ids - updated_item_ids
         if items_to_delete:

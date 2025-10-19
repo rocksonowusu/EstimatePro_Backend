@@ -51,13 +51,15 @@ class MaterialDescriptionSerializer(serializers.ModelSerializer):
         model = MaterialDescription
         fields = ['id', 'name']
 
+
 class EstimateItemSerializer(serializers.ModelSerializer):
     chosen_material = MaterialDescriptionSerializer(read_only=True)
     chosen_material_id = serializers.PrimaryKeyRelatedField(
         queryset=MaterialDescription.objects.all(),
         source='chosen_material',
         write_only=True,
-        required=False
+        required=False,
+        allow_null= True
     )
 
     class Meta:
@@ -88,6 +90,49 @@ class EstimateSerializer(serializers.ModelSerializer):
             EstimateItem.objects.create(estimate=estimate, **item_data)
         return estimate
     
+    def update(self, instance, validated_data):
+        """Update an existing estimate and it's items"""
+
+        items_data = validated_data.pop('items', None)
+
+        instance.client_name = validated_data.get('client_name', instance.client_name)
+        instance.estimate_title = validated_data.get('estimate_title', instance.estimate_title)
+        instance.notes = validated_data.get('notes', instance.notes)
+        instance.workmanship = validated_data.get('workmanship', instance.workmanship)
+        instance.total_materials = validated_data.get('total_materials', instance.total_materials)
+        instance.grand_total = validated_data.get('grand_total', instance.grand_total)
+        instance.save()
+
+        #Update items if provided
+        if items_data is not None:
+            # Get Existing items
+            existing_items ={item.id: item for item in instance.items.all()}
+            existing_items_ids = set(existing_items.keys())
+            updaated_items_ids = set()
+
+            for item_data in items_data:
+                item_id = item_data.get('id', None)
+
+                if item_id and item_id in existing_items:
+                    item = existing_items[item_id]
+                    for attr, value in item_data.items():
+                        if attr != 'id':
+                            setattr(item, attr, value)
+                    item.save()
+                    updaated_items_ids.add(item_id)
+                else:
+                    # Create new item
+                    EstimateItem.objects.create(estimate=instance, **item_data)
+                # Delete items not in the update
+                items_to_delete = existing_items_ids - updaated_items_ids
+                if items_to_delete:
+                    instance.items.filter(id__in=items_to_delete).delete()
+            return instance
+                
+
+
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
