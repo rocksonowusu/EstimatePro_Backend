@@ -41,20 +41,23 @@
       line-height: 1.4;
     }
     
-    /* Watermark container - only shows on first page */
-    .first-page-content {
-      position: relative;
+    /* Watermark - fixed position but only on first page */
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.06;
+      z-index: -1;
+      width: 70%;
+      pointer-events: none;
     }
     
-    .watermark-container {
-      position: absolute;
-      top: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60%;
-      opacity: 0.05;
-      z-index: -1;
-      pointer-events: none;
+    /* Hide watermark on pages after first */
+    @media print {
+      @page :not(:first) {
+        background: none;
+      }
     }
     
     .letterhead {
@@ -315,61 +318,57 @@
 </head>
 <body>
   
-  <!-- First Page Content with Watermark -->
-  <div class="first-page-content">
-    
-    <!-- Watermark - Only on first page -->
-    <div class="watermark-container">
-      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-        <path d="M150,20 L172,90 L245,90 L186,135 L208,205 L150,160 L92,205 L114,135 L55,90 L128,90 Z" fill="#3038A0"/>
-        <circle cx="150" cy="150" r="40" fill="white"/>
-        <text x="150" y="170" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="#3038A0">T</text>
-      </svg>
-    </div>
+  <!-- Watermark - visible on all pages centered -->
+  <div class="watermark">
+    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <path d="M150,20 L172,90 L245,90 L186,135 L208,205 L150,160 L92,205 L114,135 L55,90 L128,90 Z" fill="#3038A0"/>
+      <circle cx="150" cy="150" r="40" fill="white"/>
+      <text x="150" y="170" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="#3038A0">T</text>
+    </svg>
+  </div>
 
-    <!-- Letterhead Background -->
-    <div class="letterhead"></div>
+  <!-- Letterhead Background -->
+  <div class="letterhead"></div>
 
-    <!-- Header -->
-    <div class="header no-break">
-      <h1>{{ estimate.estimate_title }}</h1>
-    </div>
+  <!-- Header -->
+  <div class="header no-break">
+    <h1>{{ estimate.estimate_title }}</h1>
+  </div>
 
-    <!-- Info Grid -->
-    <div class="info-grid no-break">
-      <div class="info-row">
-        <div class="info-cell">
-          <div class="info-box">
-            <div class="info-title">Client Information</div>
-            <div class="info-item">
-              <span class="info-label">Name:</span>
-              <span>{{ estimate.client_name }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Address:</span>
-              <span>{{ estimate.client_address|default:"N/A" }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Contact:</span>
-              <span>{{ estimate.client_contact|default:"N/A" }}</span>
-            </div>
+  <!-- Info Grid -->
+  <div class="info-grid no-break">
+    <div class="info-row">
+      <div class="info-cell">
+        <div class="info-box">
+          <div class="info-title">Client Information</div>
+          <div class="info-item">
+            <span class="info-label">Name:</span>
+            <span>{{ estimate.client_name }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Address:</span>
+            <span>{{ estimate.client_address|default:"N/A" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Contact:</span>
+            <span>{{ estimate.client_contact|default:"N/A" }}</span>
           </div>
         </div>
-        <div class="info-cell">
-          <div class="info-box">
-            <div class="info-title">Estimate Details</div>
-            <div class="info-item">
-              <span class="info-label">Number:</span>
-              <span>EST-{{ estimate.id }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Date:</span>
-              <span>{{ estimate.created_at|date:"F j, Y" }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Valid Until:</span>
-              <span>{{ estimate.created_at|date:"F j, Y" }}</span>
-            </div>
+      </div>
+      <div class="info-cell">
+        <div class="info-box">
+          <div class="info-title">Estimate Details</div>
+          <div class="info-item">
+            <span class="info-label">Number:</span>
+            <span>EST-{{ estimate.id }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date:</span>
+            <span>{{ estimate.created_at|date:"F j, Y" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Valid Until:</span>
+            <span>{{ estimate.created_at|date:"F j, Y" }}</span>
           </div>
         </div>
       </div>
