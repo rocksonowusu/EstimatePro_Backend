@@ -5,7 +5,8 @@ from .models import UserProfile, Estimate,MaterialDescription, BusinessProfile,E
 from .serializers import OnboardingSerializers, EstimateSerializer,MaterialDescriptionSerializer, BusinessProfileSerializer,UserProfileSerializer,EstimateItemSerializer
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
+from weasyprint import HTML, CSS
+from weasyprint.text.fonts import FontConfiguration
 from django.utils.text import slugify
 import logging
 
@@ -68,33 +69,142 @@ class CreateEstimateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class EstimatePreview(APIView):
+    """
+    Generate and return PDF preview of an estimate with proper page breaks
+    """
+    
     def get(self, request, pk, format=None):
         try:
             estimate = Estimate.objects.get(pk=pk)
         except Estimate.DoesNotExist:
-            return Response({'error': 'Estimate not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'error': 'Estimate not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
         
+        # Get business profile and letterhead
         business_profile = getattr(estimate.created_by, 'business_profile', None)
-        letterhead_path = business_profile.background_image.path if business_profile and business_profile.background_image else None  # Use .path instead of .url
-
+        letterhead_path = None
+        
+        if business_profile and business_profile.background_image:
+            letterhead_path = business_profile.background_image.path
+        
+        # Prepare context for template
         context = {
             'estimate': estimate,
-            'letterhead_path': letterhead_path
+            'letterhead_path': letterhead_path,
+            'business_profile': business_profile,
         }
+        
+        # Render HTML template
         html_string = render_to_string('estimate_preview.html', context)
         
-        # Generate the PDF file.
-        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
-
+        # Configure fonts for better rendering
+        font_config = FontConfiguration()
         
+        # Additional CSS for proper page breaking
+        extra_css = CSS(string='''
+            @page {
+                size: A4;
+                margin: 25mm 20mm;
+                
+                @bottom-center {
+                    content: "Page " counter(page) " of " counter(pages);
+                    font-family: 'Roboto', Arial, sans-serif;
+                    font-size: 10px;
+                    color: #666;
+                }
+            }
+            
+            /* Ensure watermark only on first page */
+            .watermark-container {
+                position: absolute;
+                page-break-after: avoid;
+            }
+            
+            /* Proper table page breaking */
+            table {
+                page-break-inside: auto;
+            }
+            
+            thead {
+                display: table-header-group;
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+            
+            tbody {
+                display: table-row-group;
+            }
+            
+            tbody tr {
+                page-break-inside: avoid !important;
+                page-break-after: auto;
+            }
+            
+            /* Keep totals together */
+            .totals-wrapper {
+                page-break-inside: avoid !important;
+            }
+            
+            /* Keep notes together */
+            .notes {
+                page-break-inside: avoid !important;
+            }
+            
+            /* Keep footer together */
+            .footer {
+                page-break-inside: avoid !important;
+            }
+            
+            /* Prevent orphans and widows */
+            p, div {
+                orphans: 3;
+                widows: 3;
+            }
+            
+            /* First page specific styling */
+            .first-page-content {
+                page-break-after: avoid;
+            }
+            
+            .header {
+                page-break-after: avoid;
+            }
+            
+            .info-grid {
+                page-break-inside: avoid;
+            }
+        ''', font_config=font_config)
+        
+        # Generate PDF with enhanced settings
+        html = HTML(
+            string=html_string, 
+            base_url=request.build_absolute_uri('/')
+        )
+        
+        pdf_file = html.write_pdf(
+            stylesheets=[extra_css],
+            font_config=font_config,
+            # Optimize PDF size
+            optimize_size=('fonts', 'images'),
+            # Better image handling
+            presentational_hints=True
+        )
+        
+        # Create response
         response = HttpResponse(pdf_file, content_type='application/pdf')
         
-        # Log the client_name for debugging.
-        logger.debug(f"Estimate ID: {estimate.id}, Client Name: {estimate.client_name}")
+        # Create clean filename
         client_name_title = estimate.client_name.title() if estimate.client_name else str(estimate.id)
+        # Remove special characters that might cause issues
+        clean_client_name = ''.join(c for c in client_name_title if c.isalnum() or c in (' ', '-', '_'))
         
-        # Set the file name with the capitalized client name.
-        response['Content-Disposition'] = f'inline; filename="Estimate for {client_name_title}.pdf"'
+        response['Content-Disposition'] = f'inline; filename="Estimate_for_{clean_client_name}.pdf"'
+        
+        # Log for debugging
+        logger.info(f"Generated PDF for Estimate ID: {estimate.id}, Client: {estimate.client_name}")
+        
         return response
 
 class GetAllEstimates(APIView):
