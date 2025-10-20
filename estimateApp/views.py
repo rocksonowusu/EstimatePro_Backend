@@ -209,30 +209,9 @@ class EstimatePreview(APIView):
 
 class GetAllEstimates(APIView):
     def get(self, request, format=None):
-        # Get email from query parameters
-        user_email = request.query_params.get('email')
-
-        if not user_email:
-            return Response(
-                {'error': 'Emial parameter is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            # Get the user by email
-            user = UserProfile.objects.get(email=user_email)
-
-            #Filter estimates by this user
-            estimates = Estimate.objects.filter(created_by=user).order_by('-created_at')
-            serializer = EstimateSerializer(estimates, many=True)
-
-            return Response(serializer.data, status= status.HTTP_200_OK)
-        
-        except UserProfile.DoesNotExist:
-            return Response(
-                {'error': 'User not found with this email'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        estimates = Estimate.objects.all()
+        serializer = EstimateSerializer(estimates, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MaterialDescriptionListView(APIView):
     def get(self, request, format=None):
