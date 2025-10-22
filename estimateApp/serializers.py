@@ -108,7 +108,7 @@ class EstimateSerializer(serializers.ModelSerializer):
             # Get Existing items
             existing_items ={item.id: item for item in instance.items.all()}
             existing_items_ids = set(existing_items.keys())
-            updaated_items_ids = set()
+            updated_items_ids = set()
 
             for item_data in items_data:
                 item_id = item_data.get('id', None)
@@ -119,12 +119,12 @@ class EstimateSerializer(serializers.ModelSerializer):
                         if attr != 'id':
                             setattr(item, attr, value)
                     item.save()
-                    updaated_items_ids.add(item_id)
+                    updated_items_ids.add(item_id)
                 else:
                     # Create new item
                     EstimateItem.objects.create(estimate=instance, **item_data)
                 # Delete items not in the update
-                items_to_delete = existing_items_ids - updaated_items_ids
+                items_to_delete = existing_items_ids - updated_items_ids
                 if items_to_delete:
                     instance.items.filter(id__in=items_to_delete).delete()
             return instance

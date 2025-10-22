@@ -327,27 +327,31 @@ class DeleteAccountView(APIView):
 class EditEstimateView(APIView):
     def put(self, request, pk, format=None):
         """
-        Edit an exixting estimate by id
+        Edit an existing estimate by id
         """
-        #Make a copy od data
+        # Make a copy of data and remove user_email if present
         data = request.data.copy()
-
         if 'user_email' in data:
             data.pop('user_email')
-        #Get Estimate by id
+        
+        # Get Estimate by id
         try:
             estimate = Estimate.objects.get(pk=pk)
         except Estimate.DoesNotExist:
             return Response(
-                {'error':"Estimate not found"}, status=status.HTTP_404_NOT_FOUND
+                {'error': "Estimate not found"}, 
+                status=status.HTTP_404_NOT_FOUND
             )
         
-        serializer = EstimateSerializer(estimate, data = request.data, partial = True)
+        # FIX 1: Use 'data' instead of 'request.data'
+        serializer = EstimateSerializer(estimate, data=data, partial=True)
+        
         if serializer.is_valid():
             serializer.save()
 
-            if 'items' in request.data:
-                items_data = request.data['items']
+            # Handle items update separately if provided
+            if 'items' in data:
+                items_data = data['items']
                 self.update_estimate_items(estimate, items_data)
 
             # Return the updated estimate
@@ -356,26 +360,28 @@ class EditEstimateView(APIView):
                 EstimateSerializer(updated_estimate).data,
                 status=status.HTTP_200_OK
             )
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def update_estimate_items(self, estimate, items_data):
         """
         Helper function to update estimate items
         """
-        # Get the existing items
-        existing_items = estimate.items.all()
+        # Get existing items as a dictionary
         existing_items_dict = {item.id: item for item in estimate.items.all()}
-        print(existing_items)
-        existing_item_ids = set(item.id for item in existing_items_dict.keys())
-
-        # Process items from request
+        
+        # FIX 2: Correct way to get existing item IDs
+        existing_item_ids = set(existing_items_dict.keys())
+        
+        # Track which items were updated/created
         updated_item_ids = set()
 
         for item_data in items_data:
             item_id = item_data.get('id', None)
             
-            if item_id and item_id in existing_item_ids:
-                # Update existing items
+            # FIX 3: Better handling of item_id checking
+            if item_id and item_id in existing_items_dict:
+                # Update existing item
                 item = existing_items_dict[item_id]
             
                 # Handle chosen_material_id if present
@@ -388,29 +394,39 @@ class EditEstimateView(APIView):
                         except MaterialDescription.DoesNotExist:
                             pass
                 
+                # Update all fields except 'id'
                 for field, value in item_data.items():
                     if field != 'id':
                         setattr(item, field, value)
+                
                 item.save()
                 updated_item_ids.add(item_id)
             else:
                 # Create a new item
-                #handle chosen_material_id
-                if 'chosen_material_id' in item_data:
-                    material_id = item_data.pop('chosen_material_id')
+                item_create_data = item_data.copy()
+                
+                # Handle chosen_material_id
+                if 'chosen_material_id' in item_create_data:
+                    material_id = item_create_data.pop('chosen_material_id')
                     if material_id:
                         try:
                             material = MaterialDescription.objects.get(id=material_id)
-                            item_data['chosen_material'] = material
+                            item_create_data['chosen_material'] = material
                         except MaterialDescription.DoesNotExist:
                             pass
 
-                # Remove 'id' if it exists but is None or 0
-                if 'id' in item_data and not item_data['id']:
-                    item_data.pop('id')
+                # Remove 'id' if it exists but is None, 0, or empty
+                if 'id' in item_create_data:
+                    item_create_data.pop('id')
 
-                EstimateItem.objects.create(estimate=estimate, **item_data)
-        # Delete items thats not included in the update
+                # Create new item
+                new_item = EstimateItem.objects.create(
+                    estimate=estimate, 
+                    **item_create_data
+                )
+                # Don't add to updated_item_ids since it's new
+        
+        # Delete items that were not included in the update
         items_to_delete = existing_item_ids - updated_item_ids
         if items_to_delete:
             estimate.items.filter(id__in=items_to_delete).delete()

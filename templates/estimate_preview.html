@@ -3,45 +3,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ estimate.estimate_title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big Tony Enterprise - Estimate</title>
   <style>
     @page {
       size: A4;
-      margin: 25mm 20mm 25mm 20mm;
-      
-      @bottom-center {
-        content: "Page " counter(page) " of " counter(pages);
-        font-family: 'Roboto', Arial, sans-serif;
-        font-size: 10px;
-        color: #666;
-      }
+      margin: 0;
     }
-    
-    /* First page styling with watermark */
-    @page :first {
-      margin-top: 30mm;
-      
-      @top-center {
-        content: "";
+    @bottom-center {
+    content: element(footer);
       }
-    }
     
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-    
-    * {
-      box-sizing: border-box;
-    }
     
     body {
       margin: 0;
       padding: 0;
       font-family: 'Roboto', Arial, sans-serif;
-      font-size: 14px;
+      {% if letterhead_path %}
+        background: url("file://{{ letterhead_path }}") no-repeat top center;
+        background-size: 100% auto;
+      {% else %}
+        background: #f8f8f8;
+      {% endif %}
       color: #333;
-      line-height: 1.4;
+      position: relative;
     }
     
-    /* Watermark - fixed position but only on first page */
     .watermark {
       position: fixed;
       top: 50%;
@@ -50,275 +38,164 @@
       opacity: 0.06;
       z-index: -1;
       width: 70%;
-      pointer-events: none;
     }
     
-    /* Hide watermark on pages after first */
-    @media print {
-      @page :not(:first) {
-        background: none;
-      }
+    .content {
+      margin: 200px 40px 50px 40px;
+      padding: 0;
+      position: relative;
+      z-index: 1;
     }
     
-    .letterhead {
-      {% if letterhead_path %}
-      position: absolute;
-      top: -30mm;
-      left: -20mm;
-      right: -20mm;
-      height: 150px;
-      background: url("file://{{ letterhead_path }}") no-repeat top center;
-      background-size: contain;
-      z-index: -1;
-      {% endif %}
-    }
-    
-    .header {
-      margin-bottom: 30px;
+    .estimate-header {
       text-align: center;
-      padding-bottom: 15px;
-      border-bottom: 3px solid #3038A0;
-      page-break-after: avoid;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #3038A0;
+      margin-bottom: 25px;
     }
     
     h1 {
-      font-size: 26px;
-      margin: 0;
-      color: #000000;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    
-    .info-grid {
-      display: table;
-      width: 100%;
-      margin-bottom: 25px;
-      border-collapse: collapse;
-      page-break-inside: avoid;
-    }
-    
-    .info-row {
-      display: table-row;
-    }
-    
-    .info-cell {
-      display: table-cell;
-      width: 50%;
-      padding: 10px;
-      vertical-align: top;
-    }
-    
-    .info-box {
-      background: #f9f9f9;
-      padding: 15px;
-      border-left: 4px solid #3038A0;
-      min-height: 100px;
-    }
-    
-    .info-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #3038A0;
-      text-transform: uppercase;
+      font-size: 28px;
       margin-bottom: 10px;
-      letter-spacing: 0.5px;
+      color: #000000; /* Changed from #3038A0 to black */
+      font-weight: 700;
     }
     
-    .info-item {
-      margin: 6px 0;
-      font-size: 13px;
-    }
-    
-    .info-label {
-      font-weight: 500;
-      color: #555;
-      display: inline-block;
-      width: 80px;
-    }
-    
-    /* Table Styles with Better Page Breaking */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-      border: 2px solid #3038A0;
-      page-break-inside: auto;
-    }
-    
-    thead {
-      display: table-header-group;
-      background: #3038A0;
-      color: white;
-      page-break-inside: avoid;
-      page-break-after: avoid;
-    }
-    
-    thead th {
-      padding: 12px 10px;
-      font-weight: 600;
-      text-align: left;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-right: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    thead th:last-child {
-      border-right: none;
-    }
-    
-    tbody {
-      display: table-row-group;
-    }
-    
-    tbody tr {
-      border-bottom: 1px solid #ddd;
-      page-break-inside: avoid;
-      page-break-after: auto;
-    }
-    
-    tbody tr:nth-child(odd) {
-      background-color: #ffffff;
-    }
-    
-    tbody tr:nth-child(even) {
-      background-color: #f8f9fc;
-    }
-    
-    tbody td {
-      padding: 10px;
-      font-size: 13px;
-      border-right: 1px solid #eee;
-    }
-    
-    tbody td:last-child {
-      border-right: none;
-    }
-    
-    .amount-column {
-      text-align: right;
-      font-weight: 500;
-    }
-    
-    .description-column {
-      max-width: 300px;
-      word-wrap: break-word;
-    }
-    
-    /* Totals Section */
-    .totals-wrapper {
-      margin-top: 30px;
-      display: flex;
-      justify-content: flex-end;
-      page-break-inside: avoid;
-    }
-    
-    .totals-table {
-      width: 400px;
-      border: 2px solid #3038A0;
-      background: white;
-    }
-    
-    .total-row {
+    .client-info {
       display: flex;
       justify-content: space-between;
-      padding: 12px 20px;
-      border-bottom: 1px solid #eee;
+      margin-bottom: 30px;
     }
     
-    .total-label {
-      font-weight: 500;
-      color: #555;
-      font-size: 14px;
+    .client-details, .estimate-details {
+      width: 48%;
     }
     
-    .total-value {
-      font-weight: 600;
-      color: #333;
-      font-size: 14px;
-    }
-    
-    .grand-total-row {
-      background: #3038A0;
-      color: white;
-      border-bottom: none;
-      padding: 15px 20px;
-    }
-    
-    .grand-total-label {
-      font-weight: 700;
+    .section-title {
       font-size: 16px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .grand-total-value {
-      font-weight: 700;
-      font-size: 18px;
-    }
-    
-    /* Notes Section */
-    .notes {
-      margin-top: 40px;
-      padding: 20px;
-      background: #f8f9fc;
-      border-left: 5px solid #3038A0;
-      border-radius: 0 5px 5px 0;
-      page-break-inside: avoid;
-    }
-    
-    .notes-title {
-      font-size: 14px;
-      font-weight: 600;
       color: #3038A0;
-      text-transform: uppercase;
-      margin-bottom: 10px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
     }
     
-    .notes-content {
-      font-size: 13px;
-      color: #555;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-    
-    /* Footer */
-    .footer {
-      margin-top: 50px;
-      text-align: center;
-      padding: 20px 0;
-      border-top: 2px solid #3038A0;
-      page-break-inside: avoid;
-    }
-    
-    .footer-text {
-      color: #3038A0;
-      font-weight: 600;
+    p {
+      margin: 5px 0;
       font-size: 14px;
-      margin: 0;
+      line-height: 1.5;
     }
     
-    /* Page Break Controls */
-    .no-break {
-      page-break-inside: avoid;
-      break-inside: avoid;
+    .table-container {
+      margin-top: 20px;
+      width: 100%;
     }
-    
+    table, tr, td, th {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    }
+
     tr {
       page-break-inside: avoid;
       break-inside: avoid;
     }
     
-    /* Prevent widows and orphans */
-    p, div {
-      orphans: 3;
-      widows: 3;
+    table {
+      page-break-after: auto;
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid #ddd; /* Added thicker border */
+    }
+    .table-container {
+      page-break-inside: auto;
+      break-inside: auto;
+      overflow: visible;
+    }
+    
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
+    }
+    
+    th {
+      background-color: #f9f9f9;
+      font-weight: 500;
+      color: #3038A0;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+    
+    tr:nth-child(even) td {
+      background-color: rgba(248, 249, 252, 0.7);
+    }
+    
+    .amount-column {
+      text-align: right;
+    }
+    
+    .total-section {
+      margin-top: 30px;
+      width: 100%;
+    }
+    
+    .total-table {
+      width: 350px;
+      margin-left: auto;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .total-row.grand {
+      border-top: 2px solid #3038A0;
+      border-bottom: 2px solid #3038A0;
+      font-weight: 700;
+      font-size: 16px;
+      color: #3038A0;
+      margin-top: 10px;
+      padding: 12px 0;
+    }
+    
+    .notes-section {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: rgba(248, 249, 252, 0.8);
+      border-left: 4px solid #3038A0;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .ref-section {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0 30px 0;
+      font-size: 13px;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-weight: 500;
+      color: #3038A0;
     }
   </style>
 </head>
 <body>
-  
-  <!-- Watermark - visible on all pages centered -->
+  <!-- Optional watermark using the star logo -->
   <div class="watermark">
     <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <path d="M150,20 L172,90 L245,90 L186,135 L208,205 L150,160 L92,205 L114,135 L55,90 L128,90 Z" fill="#3038A0"/>
@@ -327,118 +204,87 @@
     </svg>
   </div>
 
-  <!-- Letterhead Background -->
-  <div class="letterhead"></div>
-
-  <!-- Header -->
-  <div class="header no-break">
-    <h1>{{ estimate.estimate_title }}</h1>
-  </div>
-
-  <!-- Info Grid -->
-  <div class="info-grid no-break">
-    <div class="info-row">
-      <div class="info-cell">
-        <div class="info-box">
-          <div class="info-title">Client Information</div>
-          <div class="info-item">
-            <span class="info-label">Name:</span>
-            <span>{{ estimate.client_name }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Address:</span>
-            <span>{{ estimate.client_address|default:"N/A" }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Contact:</span>
-            <span>{{ estimate.client_contact|default:"N/A" }}</span>
-          </div>
-        </div>
+  <div class="content">
+    <div class="estimate-header">
+      <h1>{{ estimate.estimate_title }}</h1>
+    </div>
+    
+    <div class="client-info">
+      <div class="client-details">
+        <div class="section-title">Client Information</div>
+        <p><strong>Name:</strong> {{ estimate.client_name }}</p>
+        <p><strong>Address:</strong> {{ estimate.client_address|default:"" }}</p>
+        <p><strong>Contact:</strong> {{ estimate.client_contact|default:"" }}</p>
       </div>
-      <div class="info-cell">
-        <div class="info-box">
-          <div class="info-title">Estimate Details</div>
-          <div class="info-item">
-            <span class="info-label">Number:</span>
-            <span>EST-{{ estimate.id }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Date:</span>
-            <span>{{ estimate.created_at|date:"F j, Y" }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Valid Until:</span>
-            <span>{{ estimate.created_at|date:"F j, Y" }}</span>
-          </div>
+      
+      <div class="estimate-details">
+        <div class="section-title">Estimate Details</div>
+        <p><strong>Estimate #:</strong> {{ estimate.estimate_number|default:"EST-" }}{{ estimate.id }}</p>
+        <p><strong>Date:</strong> {{ estimate.created_at|date:"F j, Y" }}</p>
+      </div>
+    </div>
+    
+    
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th width="50%">Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th class="amount-column">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in estimate.items.all %}
+          <tr>
+            <td>
+              {% if item.chosen_material %}
+                {{ item.chosen_material.name }}
+              {% else %}
+                {{ item.description }}
+              {% endif %}
+            </td>
+            <td>
+              {{ item.quantity }} {{ item.get_unit_display }}
+            </td>
+            <td>GH₡{{ item.unit_price|floatformat:2 }}</td>
+            <td class="amount-column">GH₡{{ item.amount|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="total-section">
+      <div class="total-table">
+        <div class="total-row">
+          <div>Total Materials:</div>
+          <div>GH₡{{ estimate.total_materials|floatformat:2 }}</div>
+        </div>
+        <div class="total-row">
+          <div>Workmanship:</div>
+          <div>GH₡{{ estimate.workmanship|floatformat:2 }}</div>
+        </div>
+        <div class="total-row grand">
+          <div>GRAND TOTAL:</div>
+          <div>GH₡{{ estimate.grand_total|floatformat:2 }}</div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Items Table (can span multiple pages) -->
-  <table>
-    <thead>
-      <tr>
-        <th width="45%" style="text-align: left;">Description</th>
-        <th width="15%" style="text-align: center;">Quantity</th>
-        <th width="20%" style="text-align: right;">Unit Price</th>
-        <th width="20%" style="text-align: right;">Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in estimate.items.all %}
-      <tr>
-        <td class="description-column">
-          {% if item.chosen_material %}
-            {{ item.chosen_material.name }}
-          {% else %}
-            {{ item.description }}
-          {% endif %}
-        </td>
-        <td style="text-align: center;">
-          {{ item.quantity }} {{ item.unit|default:"pcs" }}
-        </td>
-        <td style="text-align: right;">
-          GH₡{{ item.unit_price|floatformat:2 }}
-        </td>
-        <td class="amount-column">
-          GH₡{{ item.amount|floatformat:2 }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <!-- Totals -->
-  <div class="totals-wrapper no-break">
-    <div class="totals-table">
-      <div class="total-row">
-        <span class="total-label">Total Materials:</span>
-        <span class="total-value">GH₡{{ estimate.total_materials|floatformat:2 }}</span>
-      </div>
-      <div class="total-row">
-        <span class="total-label">Workmanship:</span>
-        <span class="total-value">GH₡{{ estimate.workmanship|floatformat:2 }}</span>
-      </div>
-      <div class="total-row grand-total-row">
-        <span class="grand-total-label">Grand Total:</span>
-        <span class="grand-total-value">GH₡{{ estimate.grand_total|floatformat:2 }}</span>
-      </div>
+    
+    {% if estimate.notes %}
+    <div class="notes-section">
+      <div class="section-title">Notes</div>
+      <p>{{ estimate.notes }}</p>
     </div>
+    {% endif %}
+    
+    <div class="footer" style="position: running(footer);">
+      <p>Thank you for your business!</p>
+    </div>
+    
+ 
   </div>
-
-  <!-- Notes -->
-  {% if estimate.notes %}
-  <div class="notes no-break">
-    <div class="notes-title">Additional Notes</div>
-    <div class="notes-content">{{ estimate.notes }}</div>
-  </div>
-  {% endif %}
-
-  <!-- Footer -->
-  <div class="footer no-break">
-    <p class="footer-text">Thank you for your business!</p>
-  </div>
-
 </body>
 </html>
