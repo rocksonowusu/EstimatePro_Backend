@@ -102,11 +102,12 @@ class EstimatePreview(APIView):
         # Configure fonts for better rendering
         font_config = FontConfiguration()
         
-        # Additional CSS for proper page breaking
+        # Enhanced CSS for proper page breaking and letterhead control
         extra_css = CSS(string='''
-            @page {
+            /* Define two page types: first page with letterhead, rest without */
+            @page first-page {
                 size: A4;
-                margin: 25mm 20mm;
+                margin: 200px 40px 50px 40px;
                 
                 @bottom-center {
                     content: "Page " counter(page) " of " counter(pages);
@@ -116,17 +117,46 @@ class EstimatePreview(APIView):
                 }
             }
             
-            /* Ensure watermark only on first page */
-            .watermark-container {
-                position: absolute;
-                page-break-after: avoid;
+            @page continuation-page {
+                size: A4;
+                margin: 40px 40px 50px 40px;  /* Smaller top margin for continuation pages */
+                background: white;  /* Override letterhead background */
+                
+                @bottom-center {
+                    content: "Page " counter(page) " of " counter(pages);
+                    font-family: 'Roboto', Arial, sans-serif;
+                    font-size: 10px;
+                    color: #666;
+                }
             }
             
-            /* Proper table page breaking */
-            table {
+            /* Apply first-page style to body initially */
+            body {
+                page: first-page;
+            }
+            
+            /* Switch to continuation-page after table starts */
+            .table-container {
+                page: continuation-page;
+            }
+            
+            /* Space management for table */
+            .table-container {
+                margin-top: 20px;
+                margin-bottom: 30px;  /* Space after table before page break */
                 page-break-inside: auto;
             }
             
+            /* Ensure table can break across pages */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 2px solid #ddd;
+                page-break-inside: auto;
+                margin-bottom: 20px;  /* Space below table on each page */
+            }
+            
+            /* Keep header row on every page */
             thead {
                 display: table-header-group;
                 page-break-inside: avoid;
@@ -137,19 +167,28 @@ class EstimatePreview(APIView):
                 display: table-row-group;
             }
             
+            /* Prevent rows from breaking across pages */
             tbody tr {
                 page-break-inside: avoid !important;
                 page-break-after: auto;
             }
             
-            /* Keep totals together */
-            .totals-wrapper {
+            /* Add spacing when table continues on new page */
+            tbody tr:first-child {
+                margin-top: 20px;  /* Space before table continuation */
+            }
+            
+            /* Keep totals section together */
+            .total-section {
                 page-break-inside: avoid !important;
+                page: continuation-page;
+                margin-top: 30px;
             }
             
             /* Keep notes together */
-            .notes {
+            .notes-section {
                 page-break-inside: avoid !important;
+                page: continuation-page;
             }
             
             /* Keep footer together */
@@ -163,20 +202,14 @@ class EstimatePreview(APIView):
                 widows: 3;
             }
             
-            /* First page specific styling */
-            .first-page-content {
-                page-break-after: avoid;
-            }
-            
-            .header {
-                page-break-after: avoid;
-            }
-            
-            .info-grid {
+            /* Keep header and client info together on first page */
+            .estimate-header,
+            .client-info {
                 page-break-inside: avoid;
+                page-break-after: avoid;
             }
         ''', font_config=font_config)
-        
+
         # Generate PDF with enhanced settings
         html = HTML(
             string=html_string, 
@@ -186,9 +219,7 @@ class EstimatePreview(APIView):
         pdf_file = html.write_pdf(
             stylesheets=[extra_css],
             font_config=font_config,
-            # Optimize PDF size
             optimize_size=('fonts', 'images'),
-            # Better image handling
             presentational_hints=True
         )
         
@@ -424,7 +455,7 @@ class EditEstimateView(APIView):
                     estimate=estimate, 
                     **item_create_data
                 )
-                # Don't add to updated_item_ids since it's new
+                
         
         # Delete items that were not included in the update
         items_to_delete = existing_item_ids - updated_item_ids
