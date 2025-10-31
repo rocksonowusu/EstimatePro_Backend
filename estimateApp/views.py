@@ -102,61 +102,41 @@ class EstimatePreview(APIView):
         # Configure fonts for better rendering
         font_config = FontConfiguration()
         
-        # Enhanced CSS for proper page breaking and letterhead control
+        # Enhanced CSS for proper positioning within letterhead boundaries
         extra_css = CSS(string='''
-            /* Define two page types: first page with letterhead, rest without */
-            @page first-page {
+            /* Single page style - letterhead on all pages */
+            @page {
                 size: A4;
-                margin: 200px 40px 50px 40px;
+                /* Margins define the content area between header and footer */
+                margin-top: 200px;    /* Space for letterhead header */
+                margin-bottom: 80px;   /* Space for letterhead footer */
+                margin-left: 50px;     /* Left padding */
+                margin-right: 50px;    /* Right padding */
                 
                 @bottom-center {
                     content: "Page " counter(page) " of " counter(pages);
                     font-family: 'Roboto', Arial, sans-serif;
-                    font-size: 10px;
+                    font-size: 9px;
                     color: #666;
+                    margin-bottom: 10px;  /* Position above the blue footer bar */
                 }
             }
             
-            @page continuation-page {
-                size: A4;
-                margin: 40px 40px 50px 40px;  /* Smaller top margin for continuation pages */
-                background: white;  /* Override letterhead background */
-                
-                @bottom-center {
-                    content: "Page " counter(page) " of " counter(pages);
-                    font-family: 'Roboto', Arial, sans-serif;
-                    font-size: 10px;
-                    color: #666;
-                }
-            }
-            
-            /* Apply first-page style to body initially */
-            body {
-                page: first-page;
-            }
-            
-            /* Switch to continuation-page after table starts */
+            /* Table spacing and page breaking */
             .table-container {
-                page: continuation-page;
-            }
-            
-            /* Space management for table */
-            .table-container {
-                margin-top: 20px;
-                margin-bottom: 30px;  /* Space after table before page break */
+                margin-top: 25px;
+                margin-bottom: 30px;  /* Space before page break */
                 page-break-inside: auto;
             }
             
-            /* Ensure table can break across pages */
             table {
                 width: 100%;
                 border-collapse: collapse;
                 border: 2px solid #ddd;
                 page-break-inside: auto;
-                margin-bottom: 20px;  /* Space below table on each page */
             }
             
-            /* Keep header row on every page */
+            /* Table header repeats on every page */
             thead {
                 display: table-header-group;
                 page-break-inside: avoid;
@@ -173,27 +153,22 @@ class EstimatePreview(APIView):
                 page-break-after: auto;
             }
             
-            /* Add spacing when table continues on new page */
-            tbody tr:first-child {
-                margin-top: 20px;  /* Space before table continuation */
-            }
-            
             /* Keep totals section together */
             .total-section {
                 page-break-inside: avoid !important;
-                page: continuation-page;
-                margin-top: 30px;
+                margin-top: 25px;
             }
             
             /* Keep notes together */
             .notes-section {
                 page-break-inside: avoid !important;
-                page: continuation-page;
+                margin-top: 30px;
             }
             
-            /* Keep footer together */
-            .footer {
+            /* Footer content (thank you message) */
+            .footer-content {
                 page-break-inside: avoid !important;
+                margin-top: 25px;
             }
             
             /* Prevent orphans and widows */
@@ -202,14 +177,14 @@ class EstimatePreview(APIView):
                 widows: 3;
             }
             
-            /* Keep header and client info together on first page */
+            /* Keep header and client info together */
             .estimate-header,
             .client-info {
                 page-break-inside: avoid;
                 page-break-after: avoid;
             }
         ''', font_config=font_config)
-
+        
         # Generate PDF with enhanced settings
         html = HTML(
             string=html_string, 
@@ -228,12 +203,10 @@ class EstimatePreview(APIView):
         
         # Create clean filename
         client_name_title = estimate.client_name.title() if estimate.client_name else str(estimate.id)
-        # Remove special characters that might cause issues
         clean_client_name = ''.join(c for c in client_name_title if c.isalnum() or c in (' ', '-', '_'))
         
         response['Content-Disposition'] = f'inline; filename="Estimate_for_{clean_client_name}.pdf"'
         
-        # Log for debugging
         logger.info(f"Generated PDF for Estimate ID: {estimate.id}, Client: {estimate.client_name}")
         
         return response
