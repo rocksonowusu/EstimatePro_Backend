@@ -11,7 +11,7 @@
     /* Page setup with proper margins for letterhead */
     @page {
       size: A4;
-      margin-top: 230px;    /* Space for letterhead at top */
+      margin-top: 600px;    /* Space for letterhead at top */
       margin-bottom: 100px;  /* Space for letterhead at bottom */
       margin-left: 50px;
       margin-right: 50px;
@@ -28,13 +28,13 @@
     
     /* First page with letterhead */
     @page :first {
-      margin-top: 230px;
+      margin-top: 600px;
       margin-bottom: 100px;
       
       /* Hide page counter on first page if needed */
-      @bottom-center {
+      {% comment %} @bottom-center {
         content: none;
-      }
+      } {% endcomment %}
     }
     
     body {
