@@ -53,10 +53,12 @@
       position: relative;
       z-index: 1;
       padding-top: 200px; /* Space below letterhead header */
-      padding-bottom: 50px; /* Space above letterhead footer */
+      padding-bottom: 150px; /* Space above letterhead footer - INCREASED to avoid covering */
       padding-left: 30px;
       padding-right: 30px;
       box-sizing: border-box;
+      max-height: 297mm; /* A4 height */
+      overflow: visible;
     }
     
     /* Subsequent pages - NO letterhead background */
