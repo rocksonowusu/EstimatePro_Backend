@@ -52,8 +52,8 @@
     .first-page .content-area {
       position: relative;
       z-index: 1;
-      padding-top: 150px; /* Space below letterhead header */
-      padding-bottom: 450px; /* Space above letterhead footer - INCREASED to avoid covering */
+      padding-top: 180px; /* Space below letterhead header */
+      padding-bottom: 250px; /* Space above letterhead footer - INCREASED to avoid covering */
       padding-left: 30px;
       padding-right: 30px;
       box-sizing: border-box;
@@ -97,7 +97,7 @@
       padding-bottom: 15px;
       border-bottom: 2px solid #3038A0;
       margin-bottom: 20px;
-      margin-top: 50px;
+      margin-top: 20px;
       page-break-after: avoid;
     }
     
@@ -195,7 +195,7 @@
     .total-table {
       width: 250px;
       margin-left: auto;
-      font-size: 11px;
+      font-size: 13px;
     }
     
     .total-row {
@@ -209,7 +209,7 @@
       border-top: 2px solid #3038A0;
       border-bottom: 2px solid #3038A0;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 14px;
       color: #3038A0;
       margin-top: 8px;
       padding: 8px 0;
@@ -222,7 +222,7 @@
       background-color: rgba(248, 249, 252, 0.8);
       border-left: 3px solid #3038A0;
       page-break-inside: avoid;
-      font-size: 10px;
+      font-size: 12px;
     }
     
     /* Footer */
@@ -232,7 +232,7 @@
       font-weight: 500;
       color: #3038A0;
       page-break-inside: avoid;
-      font-size: 11px;
+      font-size: 13px;
     }
     
     /* Continuation header for table pages */
@@ -240,7 +240,7 @@
       background: #f8f9fa;
       padding: 8px;
       text-align: center;
-      font-size: 10px;
+      font-size: 11px;
       color: #666;
       border: 1px solid #ddd;
       margin-bottom: 10px;
@@ -324,8 +324,8 @@
               <td class="amount-column">GH₡{{ item.amount|floatformat:2 }}</td>
             </tr>
             
-            <!-- Automatic page break every 25 rows for better control -->
-            {% if forloop.counter|divisibleby:25 and not forloop.last %}
+            <!-- Automatic page break every 12 rows for better control -->
+            {% if forloop.counter|divisibleby:12 and not forloop.last %}
             </tbody>
         </table>
       </div>
