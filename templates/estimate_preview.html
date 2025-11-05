@@ -14,6 +14,25 @@
       margin: 0;
     }
     
+    @page :first {
+      margin-top: 0;
+      @top-left {
+        content: "";
+      }
+      @bottom-left {
+        content: "";
+      }
+    }
+    
+    @page {
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 10px;
+        color: #666;
+        margin-bottom: 15px;
+      }
+    }
+    
     body {
       margin: 0;
       padding: 0;
@@ -21,6 +40,7 @@
       color: #333;
       position: relative;
       background: white;
+      font-size: 12px;
     }
     
     /* First page with letterhead */
@@ -30,7 +50,6 @@
       {% if letterhead_path %}
         background: url("file://{{ letterhead_path }}") no-repeat top center;
         background-size: 100% auto;
-        background-position-y: -20px; /* Adjust letterhead position if needed */
       {% endif %}
     }
     
@@ -39,9 +58,9 @@
       position: relative;
       z-index: 1;
       padding-top: 150px; /* Space below letterhead header */
-      padding-bottom: 60px; /* Space above letterhead footer */
-      padding-left: 40px;
-      padding-right: 40px;
+      padding-bottom: 80px; /* Space above letterhead footer */
+      padding-left: 30px;
+      padding-right: 30px;
       min-height: 297mm;
       box-sizing: border-box;
     }
@@ -55,23 +74,25 @@
     }
     
     .subsequent-page .content-area {
-      padding-top: 50px; /* Normal padding for subsequent pages */
-      padding-bottom: 50px;
-      padding-left: 40px;
-      padding-right: 40px;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      padding-left: 30px;
+      padding-right: 30px;
       background: white;
     }
     
-    /* Page counter */
-    .page-counter {
-      position: absolute;
-      bottom: 15px;
-      left: 0;
-      right: 0;
+    /* Header for subsequent pages */
+    .page-header {
       text-align: center;
-      font-size: 9px;
-      color: #666;
-      font-family: 'Roboto', Arial, sans-serif;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #3038A0;
+    }
+    
+    .page-header h2 {
+      font-size: 16px;
+      color: #3038A0;
+      margin: 0;
     }
     
     /* Estimate header */
@@ -84,7 +105,7 @@
     }
     
     h1 {
-      font-size: 24px;
+      font-size: 22px;
       margin-bottom: 8px;
       color: #000000;
       font-weight: 700;
@@ -94,7 +115,7 @@
     .client-info {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       page-break-after: avoid;
     }
     
@@ -103,7 +124,7 @@
     }
     
     .section-title {
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       color: #3038A0;
       font-weight: 500;
@@ -113,15 +134,15 @@
     }
     
     p {
-      margin: 4px 0;
-      font-size: 12px;
-      line-height: 1.4;
+      margin: 3px 0;
+      font-size: 11px;
+      line-height: 1.3;
     }
     
-    /* Table container */
+    /* Table container with optimized spacing */
     .table-container {
-      margin-top: 20px;
-      margin-bottom: 25px;
+      margin-top: 15px;
+      margin-bottom: 20px;
       width: 100%;
       page-break-inside: auto;
     }
@@ -131,7 +152,7 @@
       border-collapse: collapse;
       border: 1px solid #ddd;
       page-break-inside: auto;
-      font-size: 11px;
+      font-size: 10px;
     }
     
     /* Table header repeats on each page */
@@ -140,27 +161,24 @@
     }
     
     th, td {
-      padding: 8px 6px;
+      padding: 6px 4px;
       text-align: left;
-      border-bottom: 1px solid #ddd;
-      font-size: 11px;
+      border-bottom: 1px solid #eee;
+      font-size: 10px;
       line-height: 1.2;
+      page-break-inside: avoid;
     }
     
     th {
-      background-color: #f9f9f9;
+      background-color: #f8f9fa;
       font-weight: 500;
       color: #3038A0;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 9px;
+      border-bottom: 2px solid #3038A0;
     }
     
-    tr:nth-child(even) td {
-      background-color: rgba(248, 249, 252, 0.7);
-    }
-    
-    /* Prevent individual rows from breaking across pages */
-    tbody tr {
+    tr {
       page-break-inside: avoid;
       page-break-after: auto;
     }
@@ -169,23 +187,24 @@
       text-align: right;
     }
     
-    /* Total section */
+    /* Total section - only on last page */
     .total-section {
       margin-top: 20px;
       width: 100%;
       page-break-inside: avoid;
+      page-break-before: avoid;
     }
     
     .total-table {
       width: 250px;
       margin-left: auto;
-      font-size: 12px;
+      font-size: 11px;
     }
     
     .total-row {
       display: flex;
       justify-content: space-between;
-      padding: 6px 0;
+      padding: 5px 0;
       border-bottom: 1px solid #eee;
     }
     
@@ -193,50 +212,65 @@
       border-top: 2px solid #3038A0;
       border-bottom: 2px solid #3038A0;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       color: #3038A0;
       margin-top: 8px;
-      padding: 10px 0;
+      padding: 8px 0;
     }
     
-    /* Notes section */
+    /* Notes section - only on last page */
     .notes-section {
-      margin-top: 25px;
-      padding: 15px;
+      margin-top: 20px;
+      padding: 12px;
       background-color: rgba(248, 249, 252, 0.8);
       border-left: 3px solid #3038A0;
       page-break-inside: avoid;
-      font-size: 11px;
+      font-size: 10px;
     }
     
-    /* Footer */
+    /* Footer - only on last page */
     .footer {
       text-align: center;
       margin-top: 20px;
       font-weight: 500;
       color: #3038A0;
       page-break-inside: avoid;
-      font-size: 12px;
+      font-size: 11px;
     }
     
-    /* Compact styles for better fitting */
-    .compact-table {
+    /* Continuation header for table pages */
+    .continuation-header {
+      background: #f8f9fa;
+      padding: 8px;
+      text-align: center;
       font-size: 10px;
+      color: #666;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
     }
     
-    .compact-table th,
-    .compact-table td {
-      padding: 6px 4px;
-      font-size: 10px;
-    }
-    
-    /* Ensure proper breaks */
+    /* Utility classes */
     .keep-together {
       page-break-inside: avoid;
     }
     
-    .page-break {
+    .break-before {
       page-break-before: always;
+    }
+    
+    .no-break {
+      page-break-inside: avoid;
+    }
+    
+    /* Compact view for large tables */
+    .compact-mode table {
+      font-size: 9px;
+    }
+    
+    .compact-mode th,
+    .compact-mode td {
+      padding: 4px 3px;
+      font-size: 9px;
     }
   </style>
 </head>
@@ -250,7 +284,7 @@
       </div>
       
       <!-- Client information -->
-      <div class="client-info">
+      <div class="client-info keep-together">
         <div class="client-details">
           <div class="section-title">Client Information</div>
           <p><strong>Name:</strong> {{ estimate.client_name }}</p>
@@ -265,15 +299,15 @@
         </div>
       </div>
       
-      <!-- Materials table -->
+      <!-- Initial table section -->
       <div class="table-container">
-        <table class="compact-table">
+        <table>
           <thead>
             <tr>
-              <th width="45%">Description</th>
+              <th width="50%">Description</th>
               <th width="15%">Quantity</th>
-              <th width="20%">Unit Price</th>
-              <th width="20%" class="amount-column">Amount</th>
+              <th width="17%">Unit Price</th>
+              <th width="18%" class="amount-column">Amount</th>
             </tr>
           </thead>
           <tbody>
@@ -292,55 +326,79 @@
               <td>GH₡{{ item.unit_price|floatformat:2 }}</td>
               <td class="amount-column">GH₡{{ item.amount|floatformat:2 }}</td>
             </tr>
+            
+            <!-- Automatic page break every 25 rows for better control -->
+            {% if forloop.counter|divisibleby:25 and not forloop.last %}
+            </tbody>
+        </table>
+      </div>
+      
+      <!-- Page break for continued table -->
+      <div class="subsequent-page">
+        <div class="content-area">
+          <div class="page-header">
+            <h2>{{ estimate.estimate_title }} - Continued</h2>
+          </div>
+          <div class="continuation-header">
+            Estimate #: {{ estimate.estimate_number|default:"EST-" }}{{ estimate.id }} | Page {{ forloop.counter|add:1|divisibleby:25|add:1 }}
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th width="50%">Description</th>
+                  <th width="15%">Quantity</th>
+                  <th width="17%">Unit Price</th>
+                  <th width="18%" class="amount-column">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+            {% endif %}
             {% endfor %}
           </tbody>
         </table>
       </div>
       
-      <!-- Totals section -->
-      <div class="total-section keep-together">
-        <div class="total-table">
-          <div class="total-row">
-            <div>Total Materials:</div>
-            <div>GH₡{{ estimate.total_materials|floatformat:2 }}</div>
+      <!-- Final page with totals, notes, and footer -->
+      <div class="subsequent-page">
+        <div class="content-area">
+          <div class="page-header">
+            <h2>{{ estimate.estimate_title }} - Summary</h2>
           </div>
-          <div class="total-row">
-            <div>Workmanship:</div>
-            <div>GH₡{{ estimate.workmanship|floatformat:2 }}</div>
+          
+          <!-- Totals section -->
+          <div class="total-section keep-together">
+            <div class="total-table">
+              <div class="total-row">
+                <div>Total Materials:</div>
+                <div>GH₡{{ estimate.total_materials|floatformat:2 }}</div>
+              </div>
+              <div class="total-row">
+                <div>Workmanship:</div>
+                <div>GH₡{{ estimate.workmanship|floatformat:2 }}</div>
+              </div>
+              <div class="total-row grand">
+                <div>GRAND TOTAL:</div>
+                <div>GH₡{{ estimate.grand_total|floatformat:2 }}</div>
+              </div>
+            </div>
           </div>
-          <div class="total-row grand">
-            <div>GRAND TOTAL:</div>
-            <div>GH₡{{ estimate.grand_total|floatformat:2 }}</div>
+          
+          <!-- Notes section -->
+          {% if estimate.notes %}
+          <div class="notes-section keep-together">
+            <div class="section-title">Notes</div>
+            <p>{{ estimate.notes }}</p>
+          </div>
+          {% endif %}
+          
+          <!-- Footer -->
+          <div class="footer keep-together">
+            <p>Thank you for your business!</p>
           </div>
         </div>
       </div>
-      
-      <!-- Notes section -->
-      {% if estimate.notes %}
-      <div class="notes-section keep-together">
-        <div class="section-title">Notes</div>
-        <p>{{ estimate.notes }}</p>
-      </div>
-      {% endif %}
-      
-      <!-- Footer -->
-      <div class="footer keep-together">
-        <p>Thank you for your business!</p>
-      </div>
     </div>
   </div>
-
-  <!-- Only create subsequent page if really needed -->
-  {% if estimate.items.all|length > 20 %}
-  <div class="subsequent-page">
-    <div class="content-area">
-      <div class="page-counter">Page 2</div>
-      <div class="table-container">
-        <p><strong>Continued from previous page...</strong></p>
-        <!-- Additional continuation content if needed -->
-      </div>
-    </div>
-  </div>
-  {% endif %}
 </body>
 </html>
