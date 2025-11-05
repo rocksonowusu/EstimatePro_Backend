@@ -8,7 +8,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
     
-    /* Page setup with proper margins */
+    /* Page setup */
     @page {
       size: A4;
       margin: 0;
@@ -23,48 +23,49 @@
       background: white;
     }
     
-    /* First page wrapper with letterhead */
+    /* First page with letterhead */
     .first-page {
       position: relative;
-      min-height: 297mm; /* A4 height */
+      min-height: 297mm;
       {% if letterhead_path %}
         background: url("file://{{ letterhead_path }}") no-repeat top center;
         background-size: 100% auto;
+        background-position-y: -20px; /* Adjust letterhead position if needed */
       {% endif %}
     }
     
-    /* Content wrapper with proper spacing for letterhead */
-    .content {
+    /* Content area - positioned below letterhead */
+    .content-area {
       position: relative;
       z-index: 1;
-      padding-top: 180px; /* Space for letterhead at top */
-      padding-bottom: 80px; /* Space for letterhead at bottom */
-      padding-left: 50px;
-      padding-right: 50px;
-      min-height: 297mm; /* A4 height */
+      padding-top: 150px; /* Space below letterhead header */
+      padding-bottom: 60px; /* Space above letterhead footer */
+      padding-left: 40px;
+      padding-right: 40px;
+      min-height: 297mm;
       box-sizing: border-box;
     }
     
-    /* Subsequent pages - no letterhead, same margin top */
+    /* Subsequent pages */
     .subsequent-page {
       position: relative;
-      min-height: 297mm; /* A4 height */
+      min-height: 297mm;
       background: white;
-      page-break-before: always; /* Ensure it starts on new page */
+      page-break-before: always;
     }
     
-    .subsequent-page .content {
-      padding-top: 180px; /* Same top margin as first page for consistency */
+    .subsequent-page .content-area {
+      padding-top: 50px; /* Normal padding for subsequent pages */
       padding-bottom: 50px;
-      padding-left: 50px;
-      padding-right: 50px;
+      padding-left: 40px;
+      padding-right: 40px;
       background: white;
     }
     
-    /* Page counter for subsequent pages */
+    /* Page counter */
     .page-counter {
       position: absolute;
-      bottom: 30px;
+      bottom: 15px;
       left: 0;
       right: 0;
       text-align: center;
@@ -76,15 +77,15 @@
     /* Estimate header */
     .estimate-header {
       text-align: center;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       border-bottom: 2px solid #3038A0;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       page-break-after: avoid;
     }
     
     h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
+      font-size: 24px;
+      margin-bottom: 8px;
       color: #000000;
       font-weight: 700;
     }
@@ -93,7 +94,7 @@
     .client-info {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       page-break-after: avoid;
     }
     
@@ -102,25 +103,25 @@
     }
     
     .section-title {
-      font-size: 16px;
+      font-size: 14px;
       text-transform: uppercase;
       color: #3038A0;
       font-weight: 500;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       border-bottom: 1px solid #ddd;
-      padding-bottom: 5px;
+      padding-bottom: 4px;
     }
     
     p {
-      margin: 5px 0;
-      font-size: 14px;
-      line-height: 1.5;
+      margin: 4px 0;
+      font-size: 12px;
+      line-height: 1.4;
     }
     
     /* Table container */
     .table-container {
-      margin-top: 30px;
-      margin-bottom: 40px;
+      margin-top: 20px;
+      margin-bottom: 25px;
       width: 100%;
       page-break-inside: auto;
     }
@@ -128,8 +129,9 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      border: 2px solid #ddd;
+      border: 1px solid #ddd;
       page-break-inside: auto;
+      font-size: 11px;
     }
     
     /* Table header repeats on each page */
@@ -138,10 +140,11 @@
     }
     
     th, td {
-      padding: 12px 10px;
+      padding: 8px 6px;
       text-align: left;
       border-bottom: 1px solid #ddd;
-      font-size: 14px;
+      font-size: 11px;
+      line-height: 1.2;
     }
     
     th {
@@ -149,7 +152,7 @@
       font-weight: 500;
       color: #3038A0;
       text-transform: uppercase;
-      font-size: 13px;
+      font-size: 10px;
     }
     
     tr:nth-child(even) td {
@@ -166,22 +169,23 @@
       text-align: right;
     }
     
-    /* Total section - keep together */
+    /* Total section */
     .total-section {
-      margin-top: 30px;
+      margin-top: 20px;
       width: 100%;
       page-break-inside: avoid;
     }
     
     .total-table {
-      width: 350px;
+      width: 250px;
       margin-left: auto;
+      font-size: 12px;
     }
     
     .total-row {
       display: flex;
       justify-content: space-between;
-      padding: 8px 0;
+      padding: 6px 0;
       border-bottom: 1px solid #eee;
     }
     
@@ -189,42 +193,48 @@
       border-top: 2px solid #3038A0;
       border-bottom: 2px solid #3038A0;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 13px;
       color: #3038A0;
-      margin-top: 10px;
-      padding: 12px 0;
+      margin-top: 8px;
+      padding: 10px 0;
     }
     
-    /* Notes section - keep together */
+    /* Notes section */
     .notes-section {
-      margin-top: 40px;
-      padding: 20px;
+      margin-top: 25px;
+      padding: 15px;
       background-color: rgba(248, 249, 252, 0.8);
-      border-left: 4px solid #3038A0;
+      border-left: 3px solid #3038A0;
       page-break-inside: avoid;
+      font-size: 11px;
     }
     
     /* Footer */
     .footer {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 20px;
       font-weight: 500;
       color: #3038A0;
       page-break-inside: avoid;
+      font-size: 12px;
     }
     
-    /* Watermark */
-    .watermark {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: 0.06;
-      z-index: -1;
-      width: 70%;
+    /* Compact styles for better fitting */
+    .compact-table {
+      font-size: 10px;
     }
     
-    /* Ensure proper page breaks for long content */
+    .compact-table th,
+    .compact-table td {
+      padding: 6px 4px;
+      font-size: 10px;
+    }
+    
+    /* Ensure proper breaks */
+    .keep-together {
+      page-break-inside: avoid;
+    }
+    
     .page-break {
       page-break-before: always;
     }
@@ -233,16 +243,7 @@
 <body>
   <!-- First Page with Letterhead -->
   <div class="first-page">
-    <div class="content">
-      <!-- Watermark -->
-      <div class="watermark">
-        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-          <path d="M150,20 L172,90 L245,90 L186,135 L208,205 L150,160 L92,205 L114,135 L55,90 L128,90 Z" fill="#3038A0"/>
-          <circle cx="150" cy="150" r="40" fill="white"/>
-          <text x="150" y="170" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="#3038A0">T</text>
-        </svg>
-      </div>
-
+    <div class="content-area">
       <!-- Header section -->
       <div class="estimate-header">
         <h1>{{ estimate.estimate_title }}</h1>
@@ -264,15 +265,15 @@
         </div>
       </div>
       
-      <!-- Initial table content -->
+      <!-- Materials table -->
       <div class="table-container">
-        <table>
+        <table class="compact-table">
           <thead>
             <tr>
-              <th width="50%">Description</th>
-              <th>Quantity</th>
-              <th>Unit Price</th>
-              <th class="amount-column">Amount</th>
+              <th width="45%">Description</th>
+              <th width="15%">Quantity</th>
+              <th width="20%">Unit Price</th>
+              <th width="20%" class="amount-column">Amount</th>
             </tr>
           </thead>
           <tbody>
@@ -297,7 +298,7 @@
       </div>
       
       <!-- Totals section -->
-      <div class="total-section">
+      <div class="total-section keep-together">
         <div class="total-table">
           <div class="total-row">
             <div>Total Materials:</div>
@@ -316,27 +317,27 @@
       
       <!-- Notes section -->
       {% if estimate.notes %}
-      <div class="notes-section">
+      <div class="notes-section keep-together">
         <div class="section-title">Notes</div>
         <p>{{ estimate.notes }}</p>
       </div>
       {% endif %}
       
       <!-- Footer -->
-      <div class="footer">
+      <div class="footer keep-together">
         <p>Thank you for your business!</p>
       </div>
     </div>
   </div>
 
-  <!-- Manual page break for very long content -->
-  {% if estimate.items.all|length > 15 %}
+  <!-- Only create subsequent page if really needed -->
+  {% if estimate.items.all|length > 20 %}
   <div class="subsequent-page">
-    <div class="content">
+    <div class="content-area">
       <div class="page-counter">Page 2</div>
-      <!-- You can add continuation content here if needed -->
       <div class="table-container">
         <p><strong>Continued from previous page...</strong></p>
+        <!-- Additional continuation content if needed -->
       </div>
     </div>
   </div>
