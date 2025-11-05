@@ -8,10 +8,33 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
     
-    /* Base page setup - this will be overridden by external CSS */
+    /* Page setup with proper margins for letterhead */
     @page {
       size: A4;
-      margin: 0;
+      margin-top: 230px;    /* Space for letterhead at top */
+      margin-bottom: 100px;  /* Space for letterhead at bottom */
+      margin-left: 50px;
+      margin-right: 50px;
+      
+      /* Page counter styling */
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: 'Roboto', Arial, sans-serif;
+        font-size: 9px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+    }
+    
+    /* First page with letterhead */
+    @page :first {
+      margin-top: 230px;
+      margin-bottom: 100px;
+      
+      /* Hide page counter on first page if needed */
+      @bottom-center {
+        content: none;
+      }
     }
     
     body {
@@ -20,38 +43,43 @@
       font-family: 'Roboto', Arial, sans-serif;
       color: #333;
       position: relative;
+    }
+    
+    /* Letterhead container - only on first page */
+    .letterhead-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    .letterhead-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       {% if letterhead_path %}
-        /* Letterhead only on first page via background-image */
         background: url("file://{{ letterhead_path }}") no-repeat top center;
         background-size: 100% auto;
-        background-attachment: fixed;  /* This ensures it only appears once */
-      {% else %}
-        background: #f8f8f8;
       {% endif %}
     }
     
-    /* Watermark only visible on first page */
-    .watermark {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: 0.06;
-      z-index: -1;
-      width: 70%;
-    }
-    
-    /* Content wrapper - no margin here, margins controlled by @page */
+    /* Content wrapper */
     .content {
       position: relative;
       z-index: 1;
     }
     
+    /* Header section */
     .estimate-header {
       text-align: center;
       padding-bottom: 20px;
       border-bottom: 2px solid #3038A0;
       margin-bottom: 25px;
+      page-break-after: avoid;
     }
     
     h1 {
@@ -61,10 +89,12 @@
       font-weight: 700;
     }
     
+    /* Client information section */
     .client-info {
       display: flex;
       justify-content: space-between;
       margin-bottom: 30px;
+      page-break-after: avoid;
     }
     
     .client-details, .estimate-details {
@@ -87,11 +117,12 @@
       line-height: 1.5;
     }
     
-    /* Table container with controlled spacing */
+    /* Table container with proper page break handling */
     .table-container {
-      margin-top: 30px;  /* Space above table */
-      margin-bottom: 40px;  /* Space below table before potential page break */
+      margin-top: 30px;
+      margin-bottom: 40px;
       width: 100%;
+      page-break-inside: auto;
     }
     
     table {
@@ -125,9 +156,10 @@
       background-color: rgba(248, 249, 252, 0.7);
     }
     
-    /* Prevent individual rows from breaking */
+    /* Prevent individual rows from breaking across pages */
     tbody tr {
       page-break-inside: avoid;
+      page-break-after: auto;
     }
     
     .amount-column {
@@ -139,6 +171,7 @@
       margin-top: 30px;
       width: 100%;
       page-break-inside: avoid;
+      page-break-before: auto;
     }
     
     .total-table {
@@ -172,6 +205,7 @@
       page-break-inside: avoid;
     }
     
+    /* Footer section */
     .footer {
       text-align: center;
       margin-top: 30px;
@@ -179,9 +213,25 @@
       color: #3038A0;
       page-break-inside: avoid;
     }
+    
+    /* Watermark styling */
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.06;
+      z-index: -1;
+      width: 70%;
+    }
   </style>
 </head>
 <body>
+  <!-- Letterhead - only on first page -->
+  <div class="letterhead-container">
+    <div class="letterhead-background"></div>
+  </div>
+
   <!-- Watermark using the star logo -->
   <div class="watermark">
     <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">

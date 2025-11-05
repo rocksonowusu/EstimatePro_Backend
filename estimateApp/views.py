@@ -72,143 +72,50 @@ class EstimatePreview(APIView):
     """
     Generate and return PDF preview of an estimate with proper page breaks
     """
-    
     def get(self, request, pk, format=None):
         try:
             estimate = Estimate.objects.get(pk=pk)
         except Estimate.DoesNotExist:
-            return Response(
-                {'error': 'Estimate not found'}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error':'Estimate not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        # Get business profile and letterhead
-        business_profile = getattr(estimate.created_by, 'business_profile', None)
+        #Get business profile and letterhead
+        business_profile = getattr(estimate.created_by, 'business_profile',None)
         letterhead_path = None
-        
+
         if business_profile and business_profile.background_image:
             letterhead_path = business_profile.background_image.path
-        
-        # Prepare context for template
+
+        #prepare context for template
         context = {
             'estimate': estimate,
             'letterhead_path': letterhead_path,
-            'business_profile': business_profile,
+            'business_profile':business_profile
         }
-        
-        # Render HTML template
+
+        # Render html template
         html_string = render_to_string('estimate_preview.html', context)
-        
-        # Configure fonts for better rendering
         font_config = FontConfiguration()
-        
-        # Enhanced CSS for proper positioning within letterhead boundaries
-        extra_css = CSS(string='''
-            /* Single page style - letterhead on all pages */
-            @page {
-                size: A4;
-                /* Margins define the content area between header and footer */
-                margin-top: 200px;    /* Space for letterhead header */
-                margin-bottom: 80px;   /* Space for letterhead footer */
-                margin-left: 50px;     /* Left padding */
-                margin-right: 50px;    /* Right padding */
-                
-                @bottom-center {
-                    content: "Page " counter(page) " of " counter(pages);
-                    font-family: 'Roboto', Arial, sans-serif;
-                    font-size: 9px;
-                    color: #666;
-                    margin-bottom: 10px;  /* Position above the blue footer bar */
-                }
-            }
-            
-            /* Table spacing and page breaking */
-            .table-container {
-                margin-top: 25px;
-                margin-bottom: 30px;  /* Space before page break */
-                page-break-inside: auto;
-            }
-            
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                border: 2px solid #ddd;
-                page-break-inside: auto;
-            }
-            
-            /* Table header repeats on every page */
-            thead {
-                display: table-header-group;
-                page-break-inside: avoid;
-                page-break-after: avoid;
-            }
-            
-            tbody {
-                display: table-row-group;
-            }
-            
-            /* Prevent rows from breaking across pages */
-            tbody tr {
-                page-break-inside: avoid !important;
-                page-break-after: auto;
-            }
-            
-            /* Keep totals section together */
-            .total-section {
-                page-break-inside: avoid !important;
-                margin-top: 25px;
-            }
-            
-            /* Keep notes together */
-            .notes-section {
-                page-break-inside: avoid !important;
-                margin-top: 30px;
-            }
-            
-            /* Footer content (thank you message) */
-            .footer-content {
-                page-break-inside: avoid !important;
-                margin-top: 25px;
-            }
-            
-            /* Prevent orphans and widows */
-            p, div {
-                orphans: 3;
-                widows: 3;
-            }
-            
-            /* Keep header and client info together */
-            .estimate-header,
-            .client-info {
-                page-break-inside: avoid;
-                page-break-after: avoid;
-            }
-        ''', font_config=font_config)
-        
-        # Generate PDF with enhanced settings
+
+        #Generate PDF with enhanced settings
         html = HTML(
-            string=html_string, 
-            base_url=request.build_absolute_uri('/')
+            string=html_string,
+            base_url=request.build_absolute_url('/')
         )
-        
+
         pdf_file = html.write_pdf(
-            stylesheets=[extra_css],
             font_config=font_config,
             optimize_size=('fonts', 'images'),
-            presentational_hints=True
+            presentational_hints =True
         )
-        
+
         # Create response
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        
-        # Create clean filename
+
+        # Create a clean filename
         client_name_title = estimate.client_name.title() if estimate.client_name else str(estimate.id)
         clean_client_name = ''.join(c for c in client_name_title if c.isalnum() or c in (' ', '-', '_'))
-        
-        response['Content-Disposition'] = f'inline; filename="Estimate_for_{clean_client_name}.pdf"'
-        
+        response['Content-Disposition'] = f'inline; filename="Estimate_for{clean_client_name}.pdf"'
         logger.info(f"Generated PDF for Estimate ID: {estimate.id}, Client: {estimate.client_name}")
-        
         return response
 
 class GetAllEstimates(APIView):
